@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f7a3d" />
+    <title>Offline — Nma's Kitchen</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          sans-serif;
+        color: #10231a;
+        background:
+          radial-gradient(58rem 32rem at 8% -6%, rgba(24, 150, 92, 0.22), transparent 62%),
+          radial-gradient(46rem 30rem at 96% 4%, rgba(245, 158, 11, 0.16), transparent 60%),
+          linear-gradient(180deg, #f4fbf6, #e7f5ee);
+      }
+      .card {
+        position: relative;
+        width: 100%;
+        max-width: 26rem;
+        padding: 32px 28px;
+        text-align: center;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        background: rgba(255, 255, 255, 0.3);
+        -webkit-backdrop-filter: blur(24px);
+        backdrop-filter: blur(24px);
+        box-shadow: 0 20px 40px rgba(15, 58, 38, 0.14);
+      }
+      .mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+        border-radius: 18px;
+        background: #17915b;
+        color: #fff;
+        font-size: 26px;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.35rem;
+        letter-spacing: -0.01em;
+      }
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.55;
+        color: #4a5d53;
+      }
+      button {
+        margin-top: 22px;
+        padding: 13px 22px;
+        width: 100%;
+        font: inherit;
+        font-weight: 700;
+        color: #fff;
+        border: 0;
+        border-radius: 999px;
+        background: #17915b;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #14794c;
+      }
+      .note {
+        margin-top: 14px;
+        font-size: 0.75rem;
+        color: #6b7d73;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <span class="mark" aria-hidden="true">🍲</span>
+      <h1>You're offline</h1>
+      <p>
+        Nma's Kitchen needs a connection to load live menus, prices and delivery status. The app shell
+        is cached, so reconnect and everything will pick up exactly where you left off.
+      </p>
+      <button type="button" onclick="window.location.reload()">Try again</button>
+      <p class="note">Your cart and saved addresses are stored on this device.</p>
+    </main>
+  </body>
+</html>

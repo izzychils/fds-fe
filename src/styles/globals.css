@@ -1,0 +1,334 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================================================
+   DESIGN TOKENS
+   Structure, naming and the reusable utilities below are ported directly from
+   `frontend_v0/src/app/globals.css`. The `--primary` hue has been moved from
+   that project's red to Nma's Kitchen's fresh green brand, and a small number
+   of food-brand tokens have been added.
+   =========================================================================== */
+@layer base {
+  :root {
+    color-scheme: light;
+    --background: 140 30% 98%;
+    --foreground: 152 35% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 152 35% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 152 35% 9%;
+
+    /* Brand green */
+    --primary: 145 63% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-deep: 152 58% 16%;
+    --primary-soft: 145 60% 94%;
+
+    --secondary: 145 25% 96%;
+    --secondary-foreground: 152 35% 12%;
+    --muted: 145 18% 95.5%;
+    --muted-foreground: 152 12% 42%;
+    --accent: 145 30% 95%;
+    --accent-foreground: 152 35% 12%;
+
+    /* Warm food accents, used sparingly */
+    --brand-amber: 32 94% 52%;
+    --brand-amber-foreground: 30 60% 12%;
+    --brand-berry: 348 74% 50%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 145 63% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 30 60% 12%;
+    --info: 205 85% 45%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 145 16% 88%;
+    --input: 145 16% 88%;
+    --ring: 145 63% 40%;
+
+    --chart-1: 145 63% 40%;
+    --chart-2: 160 55% 50%;
+    --chart-3: 32 94% 52%;
+    --chart-4: 190 55% 45%;
+    --chart-5: 348 74% 50%;
+
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 152 35% 9%;
+    --sidebar-primary: 145 63% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 145 30% 95%;
+    --sidebar-accent-foreground: 152 35% 12%;
+    --sidebar-border: 145 16% 88%;
+    --sidebar-ring: 145 63% 40%;
+
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+      "Noto Color Emoji";
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    --radius: 0.875rem;
+    --shadow-x: 0;
+    --shadow-y: 1px;
+    --shadow-blur: 3px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0.1;
+    --shadow-color: oklch(0 0 0);
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: 152 25% 7%;
+    --foreground: 140 25% 96%;
+    --card: 152 22% 11%;
+    --card-foreground: 140 25% 96%;
+    --popover: 152 22% 13%;
+    --popover-foreground: 140 25% 96%;
+    --primary: 145 60% 48%;
+    --primary-foreground: 152 58% 8%;
+    --primary-deep: 152 40% 12%;
+    --primary-soft: 152 30% 18%;
+    --secondary: 152 18% 16%;
+    --secondary-foreground: 140 25% 96%;
+    --muted: 152 18% 16%;
+    --muted-foreground: 145 12% 66%;
+    --accent: 152 18% 20%;
+    --accent-foreground: 140 25% 96%;
+    --border: 152 18% 20%;
+    --input: 152 18% 24%;
+    --ring: 145 60% 48%;
+    --destructive: 0 70% 62%;
+    --destructive-foreground: 0 0% 100%;
+    --sidebar: 152 22% 10%;
+    --sidebar-foreground: 140 25% 96%;
+    --sidebar-primary: 145 60% 48%;
+    --sidebar-primary-foreground: 152 58% 8%;
+    --sidebar-accent: 152 18% 16%;
+    --sidebar-accent-foreground: 140 25% 96%;
+    --sidebar-border: 152 18% 20%;
+    --sidebar-ring: 145 60% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Ambient desktop backgrounds
+   Layered soft gradients kept behind the content (see `.app-ambient`).
+   --------------------------------------------------------------------------- */
+.app-ambient {
+  position: relative;
+  isolation: isolate;
+}
+
+.app-ambient::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(58rem 32rem at 8% -6%, hsl(var(--primary) / 0.22), transparent 62%),
+    radial-gradient(46rem 30rem at 96% 4%, hsl(var(--brand-amber) / 0.16), transparent 60%),
+    radial-gradient(52rem 40rem at 50% 108%, hsl(var(--primary) / 0.14), transparent 66%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(140 26% 96%));
+}
+
+.app-ambient::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(hsl(var(--primary-deep) / 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.dark .app-ambient::before {
+  background:
+    radial-gradient(58rem 32rem at 8% -6%, hsl(var(--primary) / 0.2), transparent 62%),
+    radial-gradient(46rem 30rem at 96% 4%, hsl(var(--brand-amber) / 0.1), transparent 60%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(152 24% 9%));
+}
+
+/* ---------------------------------------------------------------------------
+   Ported verbatim from frontend_v0/src/app/globals.css
+   --------------------------------------------------------------------------- */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-animation span {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+  display: inline-block;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Cool scrollbar – WebKit (Chrome, Edge, Safari) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary) / 0.6) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 100px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, hsl(var(--primary) / 0.7), hsl(var(--primary) / 0.5));
+  border-radius: 100px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease, width 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background: hsl(var(--primary));
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Hide scrollbar completely */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Stagger fade-in for list entries */
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-fade-in {
+  animation: staggerFadeIn 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-stagger-fade-in {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Small shared helpers
+   --------------------------------------------------------------------------- */
+
+/* The venue / food imagery is always cover-cropped, never stretched. */
+.img-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Radix navigation menu (header mega-menu)
+   --------------------------------------------------------------------------- */
+
+/*
+ * `NavigationMenuViewport` is the sizing box the panels animate inside. The
+ * components in `frontend_v0`-style preview shipped it with an opaque shadcn
+ * surface (`bg-popover`), which would paint a white rectangle behind our glass
+ * panel and hide the blur. The panel itself supplies the surface
+ * (`glassMorphism.cardStrong` in components/layout/nav-mega.tsx), so the
+ * viewport must stay invisible.
+ */
+[data-radix-navigation-menu-viewport] {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Pulsing marker used by the development delivery tracker. */
+@keyframes trackerPulse {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 14px hsl(var(--primary) / 0);
+  }
+}
+
+.tracker-pulse {
+  animation: trackerPulse 1.8s ease-out infinite;
+}
