@@ -30,7 +30,7 @@ import {
 } from "@/components/ui";
 import { CategoryChips, FoodCard } from "@/components/food";
 import { BannerCarousel } from "@/components/banners";
-import { FoodSearchField, LocationControl, PageContainer } from "@/components/layout/public";
+import { LocationControl, PageContainer } from "@/components/layout/public";
 import { useDb, useDbMemo, useInstallPrompt, useSession } from "@/hooks";
 import { bannerService, foodService, recommendFoods, reviewService, settingsService } from "@/services";
 import { distanceKm, formatNaira } from "@/lib/utils";
@@ -538,7 +538,7 @@ export default function LandingPage() {
                 { icon: Store, title: "Live inventory", body: "Sold-out dishes drop off the marketplace instantly." },
                 { icon: Clock, title: "Your delivery terms", body: "Set your own timeline, fee and delivery radius." },
                 { icon: Bike, title: "Rider management", body: "Add, edit, activate and assign your own riders." },
-                { icon: Sparkles, title: "Seasonal specials", body: "Publish promotional pricing with a start and end date." },
+                { icon: TrendingUp, title: "Seasonal specials", body: "Publish promotional pricing with a start and end date." },
               ].map((item) => (
                 <div key={item.title} className="rounded-2xl border border-white/50 bg-white/60 p-4">
                   <item.icon className="size-5 text-primary" aria-hidden />

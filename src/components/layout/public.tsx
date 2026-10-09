@@ -27,7 +27,7 @@ import { toast } from "sonner";
 /* ------------------------------------------------------------------ brand */
 
 export function Logo({ className, showText = true }: { className?: string; showText?: boolean }) {
-  const { siteName, logoText, logoUrl } = settingsService.get();
+  const { logoUrl } = settingsService.get();
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
       <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
