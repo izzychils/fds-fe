@@ -22,7 +22,6 @@ import {
 import {
   Badge,
   Button,
-  Card,
   EmptyState,
   GlassCard,
   Rating,
@@ -146,7 +145,7 @@ export default function LandingPage() {
     const images = foodService
       .listDecorated()
       .filter((e) => e.food.isAvailable)
-      .slice(0, 2)
+      .slice(0, 1)
       .map((e) => e.food);
     return images;
   });
@@ -154,95 +153,88 @@ export default function LandingPage() {
   return (
     <div className="space-y-14 pb-4">
       {/* ------------------------------------------------------------ hero */}
-      <section className="mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 lg:pt-10">
-        <div className="grid items-center gap-8 lg:grid-cols-2">
+      <section className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:pt-12">
+        <div className="grid items-center gap-8 lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
               Fresh food from kitchens near you,{" "}
               <span className="text-primary">delivered hot.</span>
             </h1>
-            <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
+            <p className="mt-6 max-w-xl text-lg text-muted-foreground sm:text-xl">
               {settings.tagline} Search any dish, customise it with your own protein and extras, then
               watch your delivery move through every stage. Prices in naira, no surprises at checkout.
             </p>
 
-            <div className="mt-6 space-y-3">
-              {user && (
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <LocationControl className="sm:min-w-56" />
-                </div>
-              )}
-              <div className="flex flex-1 flex-wrap gap-2">
-                <Link to="/foods" className="flex-1 sm:flex-none">
-                  <Button size="lg" fullWidth>
-                    Order now
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Button>
-                </Link>
-                <a
-                  href="#how-it-works"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.getElementById("how-it-works");
-                    if (element) {
-                      element.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
-                  className="flex-1 sm:flex-none"
-                >
-                  <Button size="lg" variant="outline" fullWidth>
-                    How it works
-                  </Button>
-                </a>
-              </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/foods">
+                <Button size="lg" className="text-base">
+                  Order now
+                  <ArrowRight className="size-5" aria-hidden />
+                </Button>
+              </Link>
+              <a
+                href="#how-it-works"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById("how-it-works");
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                <Button size="lg" variant="outline" className="text-base">
+                  How it works
+                </Button>
+              </a>
             </div>
 
-            <dl className="mt-8 grid grid-cols-3 gap-3 text-center sm:max-w-md">
+            <dl className="mt-10 grid grid-cols-3 gap-6">
               {[
                 { label: "Average delivery", value: `${settings.defaultDeliveryMinutes} min`, icon: Clock },
                 { label: "Customer rating", value: overallRating ? `${overallRating}/5` : "New", icon: Star },
                 { label: "Tracked orders", value: String(db.orders.length), icon: Truck },
               ].map((stat) => (
-                <div key={stat.label}>
-                  <dt className="flex items-center justify-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    <stat.icon className="size-3" aria-hidden /> {stat.label}
+                <GlassCard key={stat.label} intensity="card" className="rounded-2xl p-4">
+                  <dt className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <stat.icon className="size-4" aria-hidden /> {stat.label}
                   </dt>
-                  <dd className="mt-1 text-lg font-extrabold">{stat.value}</dd>
-                </div>
+                  <dd className="mt-2 text-2xl font-extrabold">{stat.value}</dd>
+                </GlassCard>
               ))}
             </dl>
           </div>
 
-          {/* food photography collage */}
+          {/* Single larger hero image */}
           <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              {heroImages.map((food) => (
-                <Link
-                  key={food.id}
-                  to={`/foods/${food.id}`}
-                  className="group relative aspect-square overflow-hidden rounded-3xl border border-white/50 shadow-xl shadow-primary-deep/10"
+            {heroImages.map((food) => (
+              <Link
+                key={food.id}
+                to={`/foods/${food.id}`}
+                className="group relative block aspect-[3/4] overflow-hidden rounded-3xl border border-white/50 shadow-2xl shadow-primary-deep/20"
+              >
+                <img
+                  src={food.image}
+                  alt={food.name}
+                  loading="eager"
+                  className="img-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <GlassCard
+                  intensity="cardStrong"
+                  className="absolute inset-x-4 bottom-4 rounded-2xl p-4"
                 >
-                  <img
-                    src={food.image}
-                    alt={food.name}
-                    loading="eager"
-                    className="img-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <span className="absolute inset-x-2 bottom-2 rounded-2xl bg-white/80 px-3 py-2 backdrop-blur-xl">
-                    <span className="block truncate text-xs font-bold">{food.name}</span>
-                    <span className="block text-[11px] text-muted-foreground">
-                      {formatNaira(food.price)}
-                    </span>
+                  <span className="block text-base font-bold">{food.name}</span>
+                  <span className="block text-sm text-muted-foreground">
+                    {formatNaira(food.price)}
                   </span>
-                </Link>
-              ))}
-            </div>
+                </GlassCard>
+              </Link>
+            ))}
             <GlassCard
               intensity="cardStrong"
-              className="absolute -bottom-4 left-4 hidden items-center gap-2 rounded-2xl px-3 py-2 sm:flex"
+              className="absolute -bottom-6 left-6 flex items-center gap-2 rounded-2xl px-4 py-3"
             >
-              <TrendingUp className="size-4 text-primary" aria-hidden />
-              <span className="text-xs font-bold">
+              <TrendingUp className="size-5 text-primary" aria-hidden />
+              <span className="text-sm font-bold">
                 {db.vendors.filter((v) => v.status === "approved").length} kitchens live, {db.foods.filter((f) => f.isAvailable).length} dishes
               </span>
             </GlassCard>
@@ -394,17 +386,17 @@ export default function LandingPage() {
           title="How ordering works"
           subtitle="Five steps from discovery to dinner."
         />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {HOW_IT_WORKS.map((step, index) => (
-            <GlassCard key={step.title} intensity="card" className="rounded-2xl p-4">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <step.icon className="size-5" aria-hidden />
+            <GlassCard key={step.title} intensity="card" className="rounded-2xl p-5">
+              <span className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                <step.icon className="size-6" aria-hidden />
               </span>
-              <p className="mt-3 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+              <p className="mt-4 text-xs font-bold uppercase tracking-wide text-muted-foreground">
                 Step {index + 1}
               </p>
-              <h3 className="text-sm font-extrabold">{step.title}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">{step.body}</p>
+              <h3 className="mt-1 text-base font-extrabold">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
             </GlassCard>
           ))}
         </div>
@@ -425,21 +417,21 @@ export default function LandingPage() {
         />
         {verifiedReviews.length > 0 ? (
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-3">
+            <div className="lg:col-span-2 space-y-4">
               {verifiedReviews.map((review) => (
-                <Card key={review.id} className="p-4">
+                <GlassCard key={review.id} intensity="card" className="rounded-2xl p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-bold">{review.userName}</p>
-                      <div className="mt-0.5 flex items-center gap-2">
+                      <p className="text-base font-bold">{review.userName}</p>
+                      <div className="mt-1 flex items-center gap-2">
                         <span className="flex gap-0.5" aria-hidden>
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
                               className={
                                 star <= review.rating
-                                  ? "size-3.5 fill-amber-400 text-amber-400"
-                                  : "size-3.5 text-muted-foreground/30"
+                                  ? "size-4 fill-amber-400 text-amber-400"
+                                  : "size-4 text-muted-foreground/30"
                               }
                             />
                           ))}
@@ -451,30 +443,30 @@ export default function LandingPage() {
                     </div>
                     <Rating value={review.rating} />
                   </div>
-                  <p className="mt-2 text-sm">{review.comment}</p>
+                  <p className="mt-3 text-base leading-relaxed">{review.comment}</p>
                   {review.photos.length > 0 ? (
                     <img
                       src={review.photos[0]}
                       alt="Customer photo"
-                      className="mt-3 h-32 w-full rounded-xl object-cover"
+                      className="mt-4 h-40 w-full rounded-xl object-cover"
                       loading="lazy"
                     />
                   ) : null}
-                  <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Store className="size-3" aria-hidden />
+                  <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Store className="size-4" aria-hidden />
                     {db.vendors.find((v) => v.id === review.vendorId)?.name} ·{" "}
                     {db.foods.find((f) => f.id === review.foodId)?.name}
                   </p>
-                </Card>
+                </GlassCard>
               ))}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <RatingSummaryPanel summary={overallSummary} />
-              <GlassCard intensity="card" className="rounded-2xl p-4">
-                <h3 className="flex items-center gap-2 text-sm font-bold">
-                  <Share2 className="size-4 text-primary" aria-hidden /> How reviews work
+              <GlassCard intensity="card" className="rounded-2xl p-5">
+                <h3 className="flex items-center gap-2 text-base font-bold">
+                  <Share2 className="size-5 text-primary" aria-hidden /> How reviews work
                 </h3>
-                <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground">
+                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                   <li>• Only customers with a delivered order can leave a verified review.</li>
                   <li>• Each customer can review a dish once per order and edit it later.</li>
                   <li>• Kitchens can reply publicly; the merchant can hide abusive reviews.</li>
@@ -626,20 +618,20 @@ export default function LandingPage() {
 
       {/* ------------------------------------------------------ trust strip */}
       <PageContainer className="py-0">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { icon: MapPin, title: "Delivery zones", body: "Each kitchen sets its own radius and fee." },
             { icon: Truck, title: "Live status history", body: "Every status change is timestamped and kept." },
             { icon: Star, title: "Honest reviews", body: "Verified badges only for real purchases." },
             { icon: Leaf, title: "Dietary filters", body: "Vegetarian, halal, gluten-free and more." },
           ].map((item) => (
-            <Card key={item.title} className="flex items-start gap-3 p-4">
-              <item.icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+            <GlassCard key={item.title} className="flex items-start gap-3 rounded-2xl p-5">
+              <item.icon className="mt-0.5 size-6 shrink-0 text-primary" aria-hidden />
               <div>
-                <p className="text-sm font-bold">{item.title}</p>
-                <p className="text-xs text-muted-foreground">{item.body}</p>
+                <p className="text-base font-bold">{item.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{item.body}</p>
               </div>
-            </Card>
+            </GlassCard>
           ))}
         </div>
       </PageContainer>

@@ -280,7 +280,6 @@ const DESKTOP_LINKS = PUBLIC_LINKS.filter((link) => link.to !== "/foods");
 
 export function PublicHeader() {
   const { user } = useSession();
-  const cartCount = useCartCount();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileSearch, setMobileSearch] = useState(false);
   const location = useLocation();
@@ -344,47 +343,21 @@ export function PublicHeader() {
                 {mobileSearch ? <X className="size-4" /> : <Search className="size-4" />}
               </button>
 
-              {user ? (
-                <>
-                  <Link
-                    to="/app/cart"
-                    aria-label={`Cart, ${cartCount} item${cartCount === 1 ? "" : "s"}`}
-                    className="relative inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 backdrop-blur-xl transition-colors hover:bg-white/75"
-                  >
-                    <ShoppingBag className="size-4" aria-hidden />
-                    {cartCount > 0 ? (
-                      <span className="absolute -right-1 -top-1 flex min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
-                        {cartCount}
-                      </span>
-                    ) : null}
-                  </Link>
-                  <Link to={user.role === "customer" ? "/app" : user.role === "vendor" ? "/vendor" : "/admin"}>
-                    <Button size="sm" variant="primary" className="hidden sm:inline-flex">
-                      <LayoutDashboard className="size-4" aria-hidden />
-                      Dashboard
-                    </Button>
-                    <span className="inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 sm:hidden">
-                      <UserIcon className="size-4" aria-hidden />
-                    </span>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link to="/sign-in?next=/app">
-                    <Button size="sm" variant="primary">
-                      Order Now
-                    </Button>
-                  </Link>
-                  <Link to="/sign-in" className="hidden sm:block">
-                    <Button size="sm" variant="ghost">
-                      Sign in
-                    </Button>
-                  </Link>
-                  <Link to="/sign-up" className="hidden sm:block">
-                    <Button size="sm">Sign up</Button>
-                  </Link>
-                </>
-              )}
+              <Link to={user ? "/app" : "/sign-in?next=/app"}>
+                <Button size="sm" variant="primary">
+                  Order Now
+                </Button>
+              </Link>
+              
+              <Link to="/sign-in" className="hidden sm:block">
+                <Button size="sm" variant="ghost">
+                  Sign in
+                </Button>
+              </Link>
+              
+              <Link to="/sign-up" className="hidden sm:block">
+                <Button size="sm">Sign up</Button>
+              </Link>
 
               <button
                 type="button"
