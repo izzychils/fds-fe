@@ -116,7 +116,7 @@ export function FoodCard({ entry, compact = false }: { entry: FoodWithVendor; co
     <>
       <article
         className={cn(
-          "group relative flex flex-col overflow-hidden rounded-2xl border border-white/50 bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-deep/10",
+          "group relative flex flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/55 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-deep/10",
           unavailable && "opacity-70",
         )}
       >

@@ -283,6 +283,7 @@ export function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileSearch, setMobileSearch] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMenuOpen(false);
@@ -343,11 +344,26 @@ export function PublicHeader() {
                 {mobileSearch ? <X className="size-4" /> : <Search className="size-4" />}
               </button>
 
-              <Link to={user ? "/app" : "/sign-in?next=/app"}>
+              <Link to="/sign-in?next=/app">
                 <Button size="sm" variant="primary">
                   Order Now
                 </Button>
               </Link>
+              
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    authService.signOut();
+                    toast.success("Signed out");
+                    navigate("/");
+                  }}
+                  className="hidden items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100 sm:inline-flex"
+                >
+                  <LogOut className="size-4" aria-hidden />
+                  Logout
+                </button>
+              )}
               
               <Link to="/sign-in" className="hidden sm:block">
                 <Button size="sm" variant="ghost">
@@ -435,16 +451,16 @@ const FOOTER_LINKS: Array<{ title: string; links: Array<{ to: string; label: str
     title: "Order",
     links: [
       { to: "/foods", label: "Browse food" },
-      { to: "/app/orders", label: "Track an order" },
-      { to: "/app/profile", label: "Your profile" },
+      { to: "/sign-in?next=/app/orders", label: "Track an order" },
+      { to: "/sign-in?next=/app/profile", label: "Your profile" },
     ],
   },
   {
     title: "Partners",
     links: [
       { to: "/vendor-signup", label: "Become a vendor" },
-      { to: "/sign-in", label: "Vendor sign in" },
-      { to: "/help/#vendors", label: "Vendor help" },
+      { to: "/sign-in?next=/vendor", label: "Vendor sign in" },
+      { to: "/help#vendors", label: "Vendor help" },
     ],
   },
   {
@@ -452,7 +468,7 @@ const FOOTER_LINKS: Array<{ title: string; links: Array<{ to: string; label: str
     links: [
       { to: "/terms", label: "Terms of service" },
       { to: "/privacy", label: "Privacy policy" },
-      { to: "/help/#refunds", label: "Refund policy" },
+      { to: "/help#refunds", label: "Refund policy" },
     ],
   },
 ];
