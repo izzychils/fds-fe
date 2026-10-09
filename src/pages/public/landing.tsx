@@ -532,11 +532,11 @@ export default function LandingPage() {
                 { icon: Bike, title: "Rider management", body: "Add, edit, activate and assign your own riders." },
                 { icon: TrendingUp, title: "Seasonal specials", body: "Publish promotional pricing with a start and end date." },
               ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-white/50 bg-white/60 p-4">
+                <GlassCard key={item.title} intensity="card" className="rounded-2xl p-4">
                   <item.icon className="size-5 text-primary" aria-hidden />
                   <p className="mt-2 text-sm font-bold">{item.title}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">{item.body}</p>
-                </div>
+                </GlassCard>
               ))}
             </div>
           </div>
@@ -570,7 +570,7 @@ export default function LandingPage() {
                     <Download className="size-4" aria-hidden /> Install the app
                   </Button>
                 ) : (
-                  <div className="rounded-2xl border border-border bg-card p-4">
+                  <div className="rounded-2xl border border-border bg-white/55 p-4 backdrop-blur-xl">
                     <p className="text-sm font-bold">
                       {supported
                         ? "Use your browser's install option"
@@ -605,7 +605,7 @@ export default function LandingPage() {
               ].map((item) => (
                 <li
                   key={item.label}
-                  className="flex items-center justify-between rounded-2xl border border-white/50 bg-white/60 px-4 py-3"
+                  className="flex items-center justify-between rounded-2xl border border-white/50 bg-white/55 px-4 py-3 backdrop-blur-xl"
                 >
                   <span className="text-sm font-semibold">{item.label}</span>
                   <span className="text-xs font-bold text-primary">{item.value}</span>
