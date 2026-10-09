@@ -320,7 +320,7 @@ export function PublicHeader() {
                     }}
                     className={({ isActive }) =>
                       cn(
-                        "rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
+                        "rounded-full px-4 py-2.5 text-[15px] font-semibold transition-colors",
                         isActive && !link.to.includes("#")
                           ? "bg-primary/12 text-primary"
                           : "text-foreground/75 hover:bg-white/60 hover:text-foreground",
@@ -370,12 +370,17 @@ export function PublicHeader() {
                 </>
               ) : (
                 <>
+                  <Link to="/sign-in?next=/app">
+                    <Button size="sm" variant="primary">
+                      Order Now
+                    </Button>
+                  </Link>
                   <Link to="/sign-in" className="hidden sm:block">
                     <Button size="sm" variant="ghost">
                       Sign in
                     </Button>
                   </Link>
-                  <Link to="/sign-up">
+                  <Link to="/sign-up" className="hidden sm:block">
                     <Button size="sm">Sign up</Button>
                   </Link>
                 </>

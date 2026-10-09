@@ -32,7 +32,7 @@ import { cuisineService, foodService, settingsService } from "@/services";
 const TRIGGER_CLASS = cn(
   glassMorphism.tab,
   glassMorphism.hover,
-  "h-auto rounded-full px-3.5 py-2 text-sm font-semibold text-foreground/80",
+  "h-auto rounded-full px-4 py-2.5 text-[15px] font-semibold text-foreground/80",
   "hover:text-foreground data-[state=open]:bg-primary/12 data-[state=open]:text-primary",
 );
 
