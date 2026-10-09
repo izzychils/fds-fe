@@ -292,15 +292,48 @@ export function PublicHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full">
-      <div className="mx-auto w-full max-w-7xl px-3 pt-3 sm:px-5">
-        <GlassCard intensity="cardStrong" className="flex flex-col gap-3 rounded-3xl p-3">
-          <div className="flex items-center gap-2 sm:gap-3">
+      <div className="w-full px-0">
+        <GlassCard intensity="cardStrong" className="flex flex-col gap-3 rounded-none p-3">
+          <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-3 sm:gap-4 sm:px-5">
             <Link to="/" aria-label="Food Delivery System home" className="shrink-0">
               <Logo showText={false} className="sm:hidden" />
               <Logo className="hidden sm:flex" />
             </Link>
 
-            <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+            {/* Desktop nav on same line as logo */}
+            <nav aria-label="Primary" className="hidden flex-1 items-center gap-1 xl:flex">
+              {DESKTOP_LINKS.map((link, index) => (
+                <Fragment key={link.to}>
+                  {index === 1 ? <HeaderBrowseMenu /> : null}
+                  <NavLink
+                    to={link.to.startsWith("/#") ? link.to : link.to}
+                    end={link.end}
+                    onClick={(e) => {
+                      if (link.to.startsWith("/#")) {
+                        e.preventDefault();
+                        const id = link.to.substring(2);
+                        const element = document.getElementById(id);
+                        if (element) {
+                          element.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }
+                    }}
+                    className={({ isActive }) =>
+                      cn(
+                        "rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
+                        isActive && !link.to.includes("#")
+                          ? "bg-primary/12 text-primary"
+                          : "text-foreground/75 hover:bg-white/60 hover:text-foreground",
+                      )
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                </Fragment>
+              ))}
+            </nav>
+
+            <div className="ml-auto flex items-center gap-1.5 sm:gap-2 xl:ml-0">
               <button
                 type="button"
                 onClick={() => setMobileSearch((prev) => !prev)}
@@ -361,7 +394,7 @@ export function PublicHeader() {
           </div>
 
           {mobileSearch ? (
-            <div>
+            <div className="mx-auto w-full max-w-7xl px-3 sm:px-5">
               <FoodSearchField size="sm" autoFocus />
               {user ? (
                 <div className="mt-2">
@@ -371,43 +404,8 @@ export function PublicHeader() {
             </div>
           ) : null}
 
-          {/* The desktop nav. Cuisines, categories and top-rated dishes are
-              reachable without leaving the header (Radix mega-menu, laid out
-              so that on narrow screens the routes stay in the mobile drawer). */}
-          <nav aria-label="Primary" className="hidden items-center gap-1 xl:flex">
-            {DESKTOP_LINKS.map((link, index) => (
-              <Fragment key={link.to}>
-                {index === 1 ? <HeaderBrowseMenu /> : null}
-                <NavLink
-                  to={link.to.startsWith("/#") ? link.to : link.to}
-                  end={link.end}
-                  onClick={(e) => {
-                    if (link.to.startsWith("/#")) {
-                      e.preventDefault();
-                      const id = link.to.substring(2);
-                      const element = document.getElementById(id);
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }
-                  }}
-                  className={({ isActive }) =>
-                    cn(
-                      "rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
-                      isActive && !link.to.includes("#")
-                        ? "bg-primary/12 text-primary"
-                        : "text-foreground/75 hover:bg-white/60 hover:text-foreground",
-                    )
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              </Fragment>
-            ))}
-          </nav>
-
           {menuOpen ? (
-            <nav aria-label="Mobile" className="grid gap-1 border-t border-white/40 pt-3 xl:hidden">
+            <nav aria-label="Mobile" className="mx-auto grid w-full max-w-7xl gap-1 border-t border-white/40 px-3 pt-3 sm:px-5 xl:hidden">
               {PUBLIC_LINKS.map((link) => (
                 <Link
                   key={link.to}
