@@ -68,6 +68,76 @@ function applyBrandMigration(db: Database): { next: Database; changed: boolean }
   };
 }
 
+/**
+ * Reviewer migration.
+ *
+ * The seeded reviews all credited one customer, so the storefront testimonial
+ * carousel showed the same name three times. Splitting them in `seed.ts` only
+ * helps a fresh browser: this backfills the two customers and their addresses,
+ * then re-points the two reviews and their orders, and only while those still
+ * point at the original account, so a visitor's own reviews are never touched.
+ */
+function applyReviewerMigration(db: Database): { next: Database; changed: boolean } {
+  const seeded = createSeedDatabase();
+  let changed = false;
+
+  const users = [...db.users];
+  for (const fixture of seeded.users) {
+    if (!users.some((user) => user.id === fixture.id)) {
+      users.push(fixture);
+      changed = true;
+    }
+  }
+
+  const addresses = [...db.addresses];
+  for (const fixture of seeded.addresses) {
+    if (!addresses.some((address) => address.id === fixture.id)) {
+      addresses.push(fixture);
+      changed = true;
+    }
+  }
+
+  // Re-point only fixtures that still hold the original owner, so this is
+  // idempotent and never rewrites a review the visitor has since changed.
+  const ownerByReview: Record<string, string> = { rev_2: "usr_customer_3", rev_3: "usr_customer_4" };
+  const reviews = db.reviews.map((review) => {
+    const target = ownerByReview[review.id];
+    if (!target || review.userId !== "usr_customer") return review;
+    const named = users.find((user) => user.id === target);
+    if (!named) return review;
+    changed = true;
+    return { ...review, userId: target, userName: named.fullName };
+  });
+
+  const orderByReview: Record<string, string> = { rev_2: "NMK-10243", rev_3: "NMK-10247" };
+  const orders = db.orders.map((order) => {
+    const review = reviews.find((entry) => orderByReview[entry.id] === order.id);
+    const target = review ? ownerByReview[review.id] : undefined;
+    if (!target || order.customerId !== "usr_customer") return order;
+    const named = users.find((user) => user.id === target);
+    const address = addresses.find((entry) => entry.userId === target && entry.isDefault);
+    if (!named || !address) return order;
+    changed = true;
+    return {
+      ...order,
+      customerId: target,
+      customerName: named.fullName,
+      customerPhone: named.phone,
+      addressId: address.id,
+    };
+  });
+
+  if (!changed) return { next: db, changed: false };
+  return { next: { ...db, users, addresses, reviews, orders }, changed: true };
+}
+
+/** Runs every data migration in order, persisting once if anything changed. */
+function migrate(db: Database): { next: Database; changed: boolean } {
+  const brand = applyBrandMigration(db);
+  const reviewers = applyReviewerMigration(brand.next);
+  return { next: reviewers.next, changed: brand.changed || reviewers.changed };
+}
+
 function loadInitial(): Database {
   if (!isBrowser()) return createSeedDatabase();
   try {
@@ -85,7 +155,7 @@ function loadInitial(): Database {
     }
     // Defensive: a document persisted by an older build may miss new keys.
     const merged = { ...createSeedDatabase(), ...parsed };
-    const migrated = applyBrandMigration(merged);
+    const migrated = migrate(merged);
     if (migrated.changed) persist(migrated.next);
     return migrated.next;
   } catch {

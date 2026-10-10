@@ -378,17 +378,24 @@ export function PublicHeader() {
         {menuOpen ? (
           <nav
             aria-label="Mobile"
-            className="mx-auto mt-3 grid w-full max-w-7xl gap-1 border-t border-white/40 px-4 pt-3 sm:px-6 xl:hidden"
+            className="mx-auto mt-3 w-full max-w-7xl px-4 sm:px-6 xl:hidden"
           >
-            {PUBLIC_LINKS.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/60"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/*
+              The same frosted panel the account dropdown uses, so the two
+              surfaces read as one design. No chevron here: the X on the toggle
+              is the close affordance.
+            */}
+            <div className="grid gap-1 rounded-2xl border border-white/50 bg-white/70 p-2 shadow-2xl shadow-black/15 backdrop-blur-2xl dark:border-white/20 dark:bg-black/60">
+              {PUBLIC_LINKS.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-white/50"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </nav>
         ) : null}
       </GlassCard>

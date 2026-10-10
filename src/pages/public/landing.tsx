@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Avatar, Button, GlassCard } from "@/components/ui";
 import { PageContainer } from "@/components/layout/public";
-import { useDbMemo } from "@/hooks";
+import { useDbMemo, useMediaQuery } from "@/hooks";
 import { cuisineService, foodService, reviewService, settingsService } from "@/services";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +49,51 @@ const PROMISES = [
 
 /** Cuisines shown per page in the popular-foods rail. */
 const PAGE_SIZE = 3;
+
+/**
+ * One cuisine card in the popular rail.
+ *
+ * Extracted so the desktop grid and the mobile scroller draw the exact same
+ * card; only the container around them differs by breakpoint.
+ */
+function CuisineCard({
+  group,
+  fallback,
+  lift,
+}: {
+  group: { cuisine: { id: string; name: string }; count: number; lead: { food: { image: string }; rating: number; ratingCount: number } | null };
+  fallback: string;
+  lift: boolean;
+}) {
+  return (
+    <Link
+      to={`/foods?cuisine=${group.cuisine.id}`}
+      className={cn(
+        "group flex h-full flex-col overflow-hidden rounded-2xl bg-card p-2 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-3",
+        // The middle card is the one the reference design lifts.
+        lift && "z-10 shadow-xl sm:-translate-y-5 sm:scale-[1.04]",
+      )}
+    >
+      <span className="relative block overflow-hidden rounded-xl">
+        <img
+          src={group.lead ? group.lead.food.image : fallback}
+          alt=""
+          loading="lazy"
+          className="img-cover aspect-[4/3] transition-transform duration-500 group-hover:scale-105"
+        />
+      </span>
+      <span className="mt-2 truncate text-[11px] font-extrabold sm:text-sm">
+        {group.cuisine.name}
+      </span>
+      <span className="mt-1 flex justify-center">
+        <Stars showValue={false} value={group.lead?.rating ?? 0} count={group.lead?.ratingCount ?? 0} />
+      </span>
+      <span className="mx-auto mt-2 inline-block rounded-full bg-primary px-2.5 py-1 text-[10px] font-extrabold text-primary-foreground transition-colors group-hover:bg-primary-deep group-hover:text-white sm:px-3 sm:text-[11px]">
+        See menu
+      </span>
+    </Link>
+  );
+}
 
 /** Photographs used when the catalogue is still empty (first run, cleared data). */
 const FALLBACK_PHOTOS = [
@@ -161,6 +206,14 @@ export default function LandingPage() {
   const settings = settingsService.get();
   const [page, setPage] = useState(0);
   const [quote, setQuote] = useState(0);
+  const railRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * On a phone the rail is a swipeable strip, so every cuisine is rendered and
+   * the visitor slides through them. The dots stay as a secondary control, and
+   * on a wider screen they are the primary one, paginating a three-up grid.
+   */
+  const isWide = useMediaQuery("(min-width: 640px)");
 
   /** Every distinct photograph on sale, in popularity order. */
   const photos = useDbMemo(() => {
@@ -202,6 +255,29 @@ export default function LandingPage() {
 
   const pageCount = Math.max(1, Math.ceil(cuisines.length / PAGE_SIZE));
   const shelf = cuisines.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
+  /**
+   * A dot jumps the rail. On a phone that means scrolling the strip to the card
+   * that page starts at; on a wider screen it means repaginating the grid, which
+   * is what the state change below already does.
+   */
+  const goToPage = (index: number) => {
+    setPage(index);
+    if (isWide) return;
+    const rail = railRef.current;
+    const target = rail?.children[index * PAGE_SIZE] as HTMLElement | undefined;
+    if (rail && target) {
+      rail.scrollTo({ left: target.offsetLeft - rail.offsetLeft, behavior: "smooth" });
+    }
+  };
+
+  /** Keeps the active dot in step with the visitor's own swiping. */
+  const syncDotToScroll = () => {
+    const rail = railRef.current;
+    if (!rail || isWide) return;
+    const stride = (rail.firstElementChild as HTMLElement | null)?.offsetWidth ?? 1;
+    setPage(Math.min(pageCount - 1, Math.round(rail.scrollLeft / Math.max(1, stride + 12))));
+  };
   const active = quotes.length > 0 ? quotes[quote % quotes.length] : null;
 
   return (
@@ -309,41 +385,35 @@ export default function LandingPage() {
         <PageContainer>
           <SectionTitle lead="Most" highlight="popular food" />
 
-          {shelf.length > 0 ? (
+          {shelf.length > 0 || cuisines.length > 0 ? (
             <>
-              <div className="mt-10 grid grid-cols-3 items-center gap-2 sm:gap-5 lg:gap-7">
-                {shelf.map((group, index) => (
-                  <Link
+              {/*
+                Phone: a snap-scrolling strip carrying every cuisine, so the
+                rail can be swiped directly. Wider screens keep the three-up
+                grid the reference design draws, paged by the dots below.
+              */}
+              <div
+                ref={railRef}
+                onScroll={syncDotToScroll}
+                className={cn(
+                  isWide
+                    ? "mt-10 grid grid-cols-3 items-center gap-2 sm:gap-5 lg:gap-7"
+                    : "no-scrollbar mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1",
+                )}
+              >
+                {(isWide ? shelf : cuisines).map((group, index) => (
+                  <div
                     key={group.cuisine.id}
-                    to={`/foods?cuisine=${group.cuisine.id}`}
                     className={cn(
-                      "group flex flex-col overflow-hidden rounded-2xl bg-card p-2 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-3",
-                      // The middle card is the one the reference design lifts.
-                      index === 1 && "z-10 shadow-xl sm:-translate-y-5 sm:scale-[1.04]",
+                      isWide ? "contents" : "w-[62%] shrink-0 snap-start first:ml-0",
                     )}
                   >
-                    <span className="relative block overflow-hidden rounded-xl">
-                      <img
-                        src={group.lead ? group.lead.food.image : shot(index + 1)}
-                        alt=""
-                        loading="lazy"
-                        className="img-cover aspect-[4/3] transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </span>
-                    <span className="mt-2 truncate text-[11px] font-extrabold sm:text-sm">
-                      {group.cuisine.name}
-                    </span>
-                    <span className="mt-1 flex justify-center">
-                      <Stars
-                        showValue={false}
-                        value={group.lead?.rating ?? 0}
-                        count={group.lead?.ratingCount ?? 0}
-                      />
-                    </span>
-                    <span className="mx-auto mt-2 inline-block rounded-full bg-primary px-2.5 py-1 text-[10px] font-extrabold text-primary-foreground transition-colors group-hover:bg-primary-deep group-hover:text-white sm:px-3 sm:text-[11px]">
-                      See menu
-                    </span>
-                  </Link>
+                    <CuisineCard
+                      group={group}
+                      fallback={shot(index + 1)}
+                      lift={isWide && index === 1}
+                    />
+                  </div>
                 ))}
               </div>
 
@@ -353,7 +423,7 @@ export default function LandingPage() {
                     <button
                       key={index}
                       type="button"
-                      onClick={() => setPage(index)}
+                      onClick={() => goToPage(index)}
                       aria-label={`Show cuisines ${index * PAGE_SIZE + 1} to ${Math.min(
                         (index + 1) * PAGE_SIZE,
                         cuisines.length,
