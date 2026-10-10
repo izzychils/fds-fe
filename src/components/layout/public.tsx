@@ -397,32 +397,36 @@ export function PublicHeader() {
             </button>
           </div>
         </div>
-
-        {menuOpen ? (
-          <nav
-            aria-label="Mobile"
-            className="absolute inset-x-0 top-full z-10 mx-auto w-full max-w-7xl px-4 pb-3 sm:px-6 xl:hidden"
-          >
-            {/*
-              The same frosted panel the account dropdown uses. It FLOATS: the
-              nav is out of flow, so opening it never changes the height of the
-              sticky header and never pushes the page underneath it.
-            */}
-            <div className="grid gap-1 rounded-2xl border border-white/50 bg-white/70 p-2 shadow-2xl shadow-black/15 backdrop-blur-2xl dark:border-white/20 dark:bg-black/60">
-              {PUBLIC_LINKS.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-white/50"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        ) : null}
       </GlassCard>
+
+      {/*
+        The menu is a SIBLING of the glass card, never a child. The card applies
+        `backdrop-filter`, which makes it both a containing block and a backdrop
+        root: nested inside it the panel was trapped under the navbar's own
+        glass, so it read as sitting behind the navbar and its blur had nothing
+        behind it to sample. Out here its backdrop is the page, so the frosted
+        blur is real and the panel paints above the card. It stays out of flow,
+        so opening it never changes the sticky header's height.
+      */}
+      {menuOpen ? (
+        <nav
+          aria-label="Mobile"
+          className="absolute inset-x-0 top-full z-20 mx-auto w-full max-w-7xl px-4 pb-3 sm:px-6 xl:hidden"
+        >
+          <div className="grid gap-1 rounded-2xl border border-white/60 bg-white/90 p-2 shadow-2xl shadow-black/25 backdrop-blur-2xl dark:border-white/25 dark:bg-black/85">
+            {PUBLIC_LINKS.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-white/60"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      ) : null}
     </header>
   );
 }

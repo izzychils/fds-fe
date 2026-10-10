@@ -387,17 +387,16 @@ export default function LandingPage() {
               {/*
                 One strip at every breakpoint, carrying every cuisine, so the
                 rail is always swiped directly. Cards are sized to leave the
-                next one peeking in, which is what says "swipe me", and the
-                dots below stay as a secondary shortcut. The scrollbar is kept
-                visible on purpose: it is the affordance that says more cards
-                are off-screen.
+                next one peeking in, which is what says "swipe me". The dots
+                below stay as a secondary shortcut, and the scrollbar itself is
+                hidden so the brand-yellow thumb never shows over the photos.
               */}
               <div
                 ref={railRef}
                 onScroll={syncDotToScroll}
                 role="group"
                 aria-label="Popular cuisines"
-                className="custom-scrollbar mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 pt-1 sm:gap-4 sm:pb-4 lg:mt-10 lg:gap-5"
+                className="no-scrollbar mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 pt-1 sm:gap-4 sm:pb-4 lg:mt-10 lg:gap-5"
               >
                 {cuisines.map((group, index) => (
                   <div
