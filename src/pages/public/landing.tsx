@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Avatar, Button, GlassCard } from "@/components/ui";
 import { PageContainer } from "@/components/layout/public";
-import { useDbMemo, useMediaQuery } from "@/hooks";
+import { useDbMemo } from "@/hooks";
 import { cuisineService, foodService, reviewService, settingsService } from "@/services";
 import { cn } from "@/lib/utils";
 
@@ -208,13 +208,6 @@ export default function LandingPage() {
   const [quote, setQuote] = useState(0);
   const railRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * On a phone the rail is a swipeable strip, so every cuisine is rendered and
-   * the visitor slides through them. The dots stay as a secondary control, and
-   * on a wider screen they are the primary one, paginating a three-up grid.
-   */
-  const isWide = useMediaQuery("(min-width: 640px)");
-
   /** Every distinct photograph on sale, in popularity order. */
   const photos = useDbMemo(() => {
     const seen = new Set<string>();
@@ -254,29 +247,33 @@ export default function LandingPage() {
   });
 
   const pageCount = Math.max(1, Math.ceil(cuisines.length / PAGE_SIZE));
-  const shelf = cuisines.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
   /**
-   * A dot jumps the rail. On a phone that means scrolling the strip to the card
-   * that page starts at; on a wider screen it means repaginating the grid, which
-   * is what the state change below already does.
+   * A dot scrolls the strip to the card that page starts at. The strip itself
+   * is the primary control, so this is only ever a shortcut.
    */
   const goToPage = (index: number) => {
-    setPage(index);
-    if (isWide) return;
     const rail = railRef.current;
     const target = rail?.children[index * PAGE_SIZE] as HTMLElement | undefined;
     if (rail && target) {
       rail.scrollTo({ left: target.offsetLeft - rail.offsetLeft, behavior: "smooth" });
+      setPage(index);
     }
   };
 
   /** Keeps the active dot in step with the visitor's own swiping. */
   const syncDotToScroll = () => {
     const rail = railRef.current;
-    if (!rail || isWide) return;
-    const stride = (rail.firstElementChild as HTMLElement | null)?.offsetWidth ?? 1;
-    setPage(Math.min(pageCount - 1, Math.round(rail.scrollLeft / Math.max(1, stride + 12))));
+    if (!rail) return;
+    const first = rail.firstElementChild as HTMLElement | null;
+    const second = rail.children[1] as HTMLElement | undefined;
+    if (!first) return;
+    // Pitch is card width plus the gap, measured rather than assumed so the
+    // dot survives a resize between breakpoints.
+    const pitch = (second ? second.offsetLeft - first.offsetLeft : first.offsetWidth + 12) || 1;
+    setPage(
+      Math.max(0, Math.min(pageCount - 1, Math.round(rail.scrollLeft / pitch / PAGE_SIZE))),
+    );
   };
   const active = quotes.length > 0 ? quotes[quote % quotes.length] : null;
 
@@ -385,33 +382,32 @@ export default function LandingPage() {
         <PageContainer>
           <SectionTitle lead="Most" highlight="popular food" />
 
-          {shelf.length > 0 || cuisines.length > 0 ? (
+          {cuisines.length > 0 ? (
             <>
               {/*
-                Phone: a snap-scrolling strip carrying every cuisine, so the
-                rail can be swiped directly. Wider screens keep the three-up
-                grid the reference design draws, paged by the dots below.
+                One strip at every breakpoint, carrying every cuisine, so the
+                rail is always swiped directly. Cards are sized to leave the
+                next one peeking in, which is what says "swipe me", and the
+                dots below stay as a secondary shortcut. The scrollbar is kept
+                visible on purpose: it is the affordance that says more cards
+                are off-screen.
               */}
               <div
                 ref={railRef}
                 onScroll={syncDotToScroll}
-                className={cn(
-                  isWide
-                    ? "mt-10 grid grid-cols-3 items-center gap-2 sm:gap-5 lg:gap-7"
-                    : "no-scrollbar mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1",
-                )}
+                role="group"
+                aria-label="Popular cuisines"
+                className="custom-scrollbar mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 pt-1 sm:gap-4 sm:pb-4 lg:mt-10 lg:gap-5"
               >
-                {(isWide ? shelf : cuisines).map((group, index) => (
+                {cuisines.map((group, index) => (
                   <div
                     key={group.cuisine.id}
-                    className={cn(
-                      isWide ? "contents" : "w-[62%] shrink-0 snap-start first:ml-0",
-                    )}
+                    className="w-[62%] shrink-0 snap-start sm:w-[45%] lg:w-[31%]"
                   >
                     <CuisineCard
                       group={group}
                       fallback={shot(index + 1)}
-                      lift={isWide && index === 1}
+                      lift={index % PAGE_SIZE === 1}
                     />
                   </div>
                 ))}

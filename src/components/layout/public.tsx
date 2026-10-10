@@ -329,11 +329,34 @@ const DESKTOP_LINKS = PUBLIC_LINKS.filter(
 export function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const menuRootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMenuOpen(false), [location.pathname, location.hash]);
 
+  /*
+   * Outside-click close, the same mechanism the account dropdown uses. A scrim
+   * element cannot work here: the header is a `backdrop-blur`ed GlassCard, and
+   * a backdrop filter makes it a containing block, so a `fixed` scrim inside it
+   * is trapped in the header box instead of covering the page.
+   */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointer = (event: MouseEvent) => {
+      if (!menuRootRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
   return (
-    <header className="sticky top-0 z-40 w-full">
+    <header className="sticky top-0 z-40 w-full" ref={menuRootRef}>
       <GlassCard intensity="cardStrong" className="flex w-full flex-col rounded-none border-x-0 border-t-0 py-3">
         <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 sm:px-6">
           <Link to="/" aria-label="Chupnow home" className="shrink-0">
@@ -378,18 +401,19 @@ export function PublicHeader() {
         {menuOpen ? (
           <nav
             aria-label="Mobile"
-            className="mx-auto mt-3 w-full max-w-7xl px-4 sm:px-6 xl:hidden"
+            className="absolute inset-x-0 top-full z-10 mx-auto w-full max-w-7xl px-4 pb-3 sm:px-6 xl:hidden"
           >
             {/*
-              The same frosted panel the account dropdown uses, so the two
-              surfaces read as one design. No chevron here: the X on the toggle
-              is the close affordance.
+              The same frosted panel the account dropdown uses. It FLOATS: the
+              nav is out of flow, so opening it never changes the height of the
+              sticky header and never pushes the page underneath it.
             */}
             <div className="grid gap-1 rounded-2xl border border-white/50 bg-white/70 p-2 shadow-2xl shadow-black/15 backdrop-blur-2xl dark:border-white/20 dark:bg-black/60">
               {PUBLIC_LINKS.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
+                  onClick={() => setMenuOpen(false)}
                   className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-white/50"
                 >
                   {link.label}
