@@ -230,7 +230,7 @@ export default function BrowseFoodPage() {
     <PageContainer className="space-y-6">
       <SectionHeading
         title={term ? `Results for “${term}”` : "Browse every dish"}
-        subtitle="Search matches dish names, descriptions, ingredients, categories and cuisines — never addresses."
+        subtitle="Search matches dish names, descriptions, ingredients, categories and cuisines, never addresses."
         action={<LocationControl className="hidden lg:flex" />}
       />
 

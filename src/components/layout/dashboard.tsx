@@ -274,33 +274,43 @@ export function DashboardLayout({ role }: { role: Role }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 border-b border-white/40 bg-white/45 backdrop-blur-xl">
-          <div className="flex items-center gap-3 px-4 py-3">
+          <div className="flex items-center gap-3 px-4 py-3 sm:px-6">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
               aria-label="Open navigation"
-              className="rounded-full border border-border bg-card p-2 lg:hidden"
+              className="rounded-full border border-white/50 bg-white/55 p-2 backdrop-blur-xl lg:hidden"
             >
               <MenuIcon className="size-5" aria-hidden />
             </button>
+
+            {/* Greeting first, the way the reference dashboard screens open. */}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold">
-                {user.role === "admin" ? "Merchant console" : vendor?.name ?? "Vendor dashboard"}
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                Hello
               </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {user.role === "admin"
-                  ? "Platform-wide oversight across every kitchen"
-                  : "Managing your own kitchen only"}
-              </p>
+              <p className="truncate text-base font-extrabold tracking-tight">{user.fullName}</p>
             </div>
-            <Badge tone={user.role === "admin" ? "primary" : "info"}>
-              {user.role === "admin" ? "Merchant / Admin" : "Vendor"}
+
+            <Badge tone={user.role === "admin" ? "primary" : "info"} className="hidden sm:inline-flex">
+              {user.role === "admin" ? "Merchant console" : "Vendor"}
             </Badge>
+
+            <Link to="/foods" className="hidden sm:block">
+              <Button size="sm" variant="glass">
+                <ExternalLink className="size-4" aria-hidden /> Storefront
+              </Button>
+            </Link>
+
+            <Avatar name={user.fullName} src={user.avatarUrl} className="size-10" />
           </div>
         </header>
 
         <main id="dashboard-main" className="min-w-0 flex-1 p-4 pb-12 sm:p-6">
-          <Outlet />
+          {/* Content fades in with each route so navigation feels continuous. */}
+          <div key={location.pathname} className="animate-stagger-fade-in">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
@@ -318,11 +328,11 @@ export function DashboardHeading({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="text-xl font-extrabold tracking-tight sm:text-2xl">{title}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
         {description ? (
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{description}</p>
         ) : null}
       </div>
       {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}

@@ -14,7 +14,7 @@ export function RatingSummaryPanel({ summary }: { summary: RatingSummary }) {
       <div className="flex items-center gap-5">
         <div className="text-center">
           <p className="text-4xl font-extrabold tracking-tight">
-            {summary.count > 0 ? summary.rating.toFixed(1) : "—"}
+            {summary.count > 0 ? summary.rating.toFixed(1) : "None"}
           </p>
           <div className="mt-1 flex justify-center gap-0.5" aria-hidden>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -133,7 +133,7 @@ export function ReviewItem({
 
           {review.vendorReply ? (
             <div className="mt-3 rounded-xl border-l-4 border-primary/40 bg-primary/6 p-3">
-              <p className="flex items-center gap-1.5 text-xs font-bold text-primary">
+              <p className="flex items-center gap-1.5 text-xs font-bold text-primary-ink">
                 <MessageSquareReply className="size-3.5" aria-hidden /> Kitchen replied
               </p>
               <p className="mt-1 text-sm">{review.vendorReply.text}</p>

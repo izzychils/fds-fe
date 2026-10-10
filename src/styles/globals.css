@@ -5,70 +5,78 @@
 /* ===========================================================================
    DESIGN TOKENS
    Structure, naming and the reusable utilities below are ported directly from
-   `frontend_v0/src/app/globals.css`. The `--primary` hue has been moved from
-   that project's red to Nma's Kitchen's fresh green brand, and a small number
-   of food-brand tokens have been added.
+   `frontend_v0/src/app/globals.css`. The palette has been moved to the brand's
+   yellow-on-ink identity: ink (#0d0c0a-ish) for text, yellow for action, warm
+   off-white surfaces that let the glass panels read as glass. A few food-brand
+   tokens are kept alongside them.
    =========================================================================== */
 @layer base {
   :root {
     color-scheme: light;
-    --background: 140 30% 98%;
-    --foreground: 152 35% 9%;
+    --background: 40 40% 98%;
+    --foreground: 30 12% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 152 35% 9%;
+    --card-foreground: 30 12% 8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 152 35% 9%;
+    --popover-foreground: 30 12% 8%;
 
-    /* Brand green */
-    --primary: 145 63% 40%;
-    --primary-foreground: 0 0% 100%;
-    --primary-deep: 152 58% 16%;
-    --primary-soft: 145 60% 94%;
+    /* Brand yellow on ink */
+    --primary: 44 97% 51%;
+    --primary-foreground: 30 14% 8%;
+    --primary-deep: 30 10% 9%;
+    --primary-soft: 45 100% 93%;
 
-    --secondary: 145 25% 96%;
-    --secondary-foreground: 152 35% 12%;
-    --muted: 145 18% 95.5%;
-    --muted-foreground: 152 12% 42%;
-    --accent: 145 30% 95%;
-    --accent-foreground: 152 35% 12%;
+    /*
+     * `--primary` is a background colour: at full strength yellow cannot carry
+     * text on a light surface (about 1.9:1). Anywhere the brand colour has to be
+     * readable AS text on light glass, this deeper gold is used instead, which
+     * reaches roughly 5:1 against the warm background.
+     */
+    --gold-ink: 32 84% 31%;
+
+    --secondary: 42 38% 95%;
+    --secondary-foreground: 30 12% 10%;
+    --muted: 40 24% 95%;
+    --muted-foreground: 30 8% 40%;
+    --accent: 45 82% 93%;
+    --accent-foreground: 30 12% 10%;
 
     /* Warm food accents, used sparingly */
-    --brand-amber: 32 94% 52%;
-    --brand-amber-foreground: 30 60% 12%;
-    --brand-berry: 348 74% 50%;
+    --brand-amber: 34 96% 50%;
+    --brand-amber-foreground: 30 60% 10%;
+    --brand-berry: 8 84% 55%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 46%;
     --destructive-foreground: 0 0% 100%;
-    --success: 145 63% 40%;
+    --success: 155 55% 32%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 30 60% 12%;
-    --info: 205 85% 45%;
+    --warning: 32 94% 46%;
+    --warning-foreground: 30 60% 10%;
+    --info: 205 80% 42%;
     --info-foreground: 0 0% 100%;
 
-    --border: 145 16% 88%;
-    --input: 145 16% 88%;
-    --ring: 145 63% 40%;
+    --border: 40 18% 88%;
+    --input: 40 18% 88%;
+    --ring: 44 97% 46%;
 
-    --chart-1: 145 63% 40%;
-    --chart-2: 160 55% 50%;
-    --chart-3: 32 94% 52%;
-    --chart-4: 190 55% 45%;
-    --chart-5: 348 74% 50%;
+    --chart-1: 44 97% 51%;
+    --chart-2: 30 12% 14%;
+    --chart-3: 34 96% 50%;
+    --chart-4: 8 84% 55%;
+    --chart-5: 199 62% 44%;
 
     --sidebar: 0 0% 100%;
-    --sidebar-foreground: 152 35% 9%;
-    --sidebar-primary: 145 63% 40%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 145 30% 95%;
-    --sidebar-accent-foreground: 152 35% 12%;
-    --sidebar-border: 145 16% 88%;
-    --sidebar-ring: 145 63% 40%;
+    --sidebar-foreground: 30 12% 8%;
+    --sidebar-primary: 44 97% 51%;
+    --sidebar-primary-foreground: 30 14% 8%;
+    --sidebar-accent: 45 82% 93%;
+    --sidebar-accent-foreground: 30 12% 10%;
+    --sidebar-border: 40 18% 88%;
+    --sidebar-ring: 44 97% 46%;
 
-    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
-      BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-      "Noto Color Emoji";
+    --font-sans: "Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
@@ -93,35 +101,36 @@
 
   .dark {
     color-scheme: dark;
-    --background: 152 25% 7%;
-    --foreground: 140 25% 96%;
-    --card: 152 22% 11%;
-    --card-foreground: 140 25% 96%;
-    --popover: 152 22% 13%;
-    --popover-foreground: 140 25% 96%;
-    --primary: 145 60% 48%;
-    --primary-foreground: 152 58% 8%;
-    --primary-deep: 152 40% 12%;
-    --primary-soft: 152 30% 18%;
-    --secondary: 152 18% 16%;
-    --secondary-foreground: 140 25% 96%;
-    --muted: 152 18% 16%;
-    --muted-foreground: 145 12% 66%;
-    --accent: 152 18% 20%;
-    --accent-foreground: 140 25% 96%;
-    --border: 152 18% 20%;
-    --input: 152 18% 24%;
-    --ring: 145 60% 48%;
-    --destructive: 0 70% 62%;
+    --background: 0 0% 6%;
+    --foreground: 42 30% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 42 30% 96%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 42 30% 96%;
+    --primary: 44 97% 55%;
+    --primary-foreground: 30 14% 6%;
+    --primary-deep: 40 10% 10%;
+    --primary-soft: 40 22% 17%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 42 30% 96%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 42 12% 68%;
+    --accent: 40 22% 17%;
+    --accent-foreground: 42 30% 96%;
+    --border: 0 0% 20%;
+    --input: 0 0% 23%;
+    --ring: 44 97% 55%;
+    --gold-ink: 44 97% 58%;
+    --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 100%;
-    --sidebar: 152 22% 10%;
-    --sidebar-foreground: 140 25% 96%;
-    --sidebar-primary: 145 60% 48%;
-    --sidebar-primary-foreground: 152 58% 8%;
-    --sidebar-accent: 152 18% 16%;
-    --sidebar-accent-foreground: 140 25% 96%;
-    --sidebar-border: 152 18% 20%;
-    --sidebar-ring: 145 60% 48%;
+    --sidebar: 0 0% 9%;
+    --sidebar-foreground: 42 30% 96%;
+    --sidebar-primary: 44 97% 55%;
+    --sidebar-primary-foreground: 30 14% 6%;
+    --sidebar-accent: 40 22% 17%;
+    --sidebar-accent-foreground: 42 30% 96%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 44 97% 55%;
   }
 }
 
@@ -138,6 +147,18 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+  }
+
+  /*
+   * Display type. Outfit's optical sizing flattens at body sizes, so headings
+   * get a tighter tracking and a heavier default weight than the rest of the
+   * interface — the reference design leans on very bold, tightly set headlines.
+   */
+  h1,
+  h2,
+  h3 {
+    font-weight: 800;
+    letter-spacing: -0.025em;
   }
 
   button {
@@ -165,10 +186,10 @@
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(58rem 32rem at 8% -6%, hsl(var(--primary) / 0.22), transparent 62%),
-    radial-gradient(46rem 30rem at 96% 4%, hsl(var(--brand-amber) / 0.16), transparent 60%),
-    radial-gradient(52rem 40rem at 50% 108%, hsl(var(--primary) / 0.14), transparent 66%),
-    linear-gradient(180deg, hsl(var(--background)), hsl(140 26% 96%));
+    radial-gradient(56rem 32rem at 10% -10%, hsl(var(--primary) / 0.3), transparent 62%),
+    radial-gradient(42rem 28rem at 94% 2%, hsl(var(--brand-amber) / 0.2), transparent 62%),
+    radial-gradient(58rem 38rem at 50% 110%, hsl(var(--primary) / 0.16), transparent 66%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(40 36% 96%));
 }
 
 .app-ambient::after {
@@ -177,16 +198,16 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.5;
-  background-image: radial-gradient(hsl(var(--primary-deep) / 0.07) 1px, transparent 1px);
+  opacity: 0.55;
+  background-image: radial-gradient(hsl(30 12% 10% / 0.07) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
 .dark .app-ambient::before {
   background:
-    radial-gradient(58rem 32rem at 8% -6%, hsl(var(--primary) / 0.2), transparent 62%),
-    radial-gradient(46rem 30rem at 96% 4%, hsl(var(--brand-amber) / 0.1), transparent 60%),
-    linear-gradient(180deg, hsl(var(--background)), hsl(152 24% 9%));
+    radial-gradient(56rem 32rem at 10% -10%, hsl(var(--primary) / 0.22), transparent 62%),
+    radial-gradient(42rem 28rem at 94% 2%, hsl(var(--brand-amber) / 0.12), transparent 62%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(0 0% 8%));
 }
 
 /* ---------------------------------------------------------------------------
@@ -331,4 +352,77 @@
 
 .tracker-pulse {
   animation: trackerPulse 1.8s ease-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Brand shapes and motion
+   The organic blobs behind hero imagery and the slow floats used on the
+   floating stat cards. Both are decoration only and never carry meaning.
+   --------------------------------------------------------------------------- */
+
+.blob {
+  position: absolute;
+  z-index: 0;
+  background: hsl(var(--primary));
+  filter: none;
+}
+
+/* Blob with the soft squashed silhouette used behind the hero photograph. */
+.blob-hero {
+  border-radius: 62% 38% 44% 56% / 52% 46% 54% 48%;
+}
+
+.blob-card {
+  border-radius: 38% 62% 56% 44% / 46% 54% 46% 54%;
+}
+
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: floatY 5.5s ease-in-out infinite;
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Entrance animation for content that mounts with the page. */
+.reveal-up {
+  animation: revealUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * Horizontal snap rail used by the landing page's dish carousels. The rail is
+ * deliberately scrollable on every breakpoint so a short list never looks
+ * stretched, while desktop uses it as a plain row of cards.
+ */
+.snap-rail {
+  scroll-snap-type: x mandatory;
+}
+
+.snap-rail > * {
+  scroll-snap-align: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .reveal-up {
+    animation: none;
+    opacity: 1;
+  }
 }

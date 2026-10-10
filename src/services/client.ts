@@ -125,6 +125,6 @@ export async function createDevelopmentPaymentIntent(args: {
     status: "pending",
     provider: "development",
     message:
-      "Development payment transport — no card was charged and no provider confirmed this transaction.",
+      "Development payment transport, no card was charged and no provider confirmed this transaction.",
   };
 }

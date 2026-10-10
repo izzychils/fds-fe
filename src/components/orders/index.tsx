@@ -293,7 +293,7 @@ export function OrderTotals({ order, feeBasis }: { order: Order; feeBasis?: stri
         Payment status: <strong>{order.paymentStatus}</strong>
         {order.paymentReference ? ` · ref ${order.paymentReference}` : ""}
         {order.paymentStatus !== "paid"
-          ? " — no payment provider is connected in this build, so nothing has been charged."
+          ? ", no payment provider is connected in this build, so nothing has been charged."
           : ""}
       </p>
     </GlassCard>
@@ -351,7 +351,7 @@ export function TrackingPanel({ order, rider }: { order: Order; rider: Rider | n
             referrerPolicy="no-referrer"
           />
           <div className="pointer-events-none absolute inset-x-3 bottom-3 rounded-xl bg-white/85 px-3 py-2 text-[11px] font-medium backdrop-blur">
-            The map tiles are real. The courier marker is a development simulation — no GPS
+            The map tiles are real. The courier marker is a development simulation, no GPS
             provider is connected to this build.
           </div>
         </div>

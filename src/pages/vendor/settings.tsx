@@ -277,7 +277,7 @@ export function VendorReviewsPage() {
     <div className="space-y-5">
       <DashboardHeading
         title="Customer reviews"
-        description="Reviews on your dishes only. Reply publicly — your response appears under the review for everyone."
+        description="Reviews on your dishes only. Reply publicly, your response appears under the review for everyone."
       />
       <ReviewsManager scope="vendor" vendorId={vendor.id} />
     </div>

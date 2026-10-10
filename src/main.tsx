@@ -15,7 +15,7 @@ createRoot(container).render(
       closeButton
       toastOptions={{
         className:
-          "!rounded-2xl !border !border-white/50 !bg-white/85 !text-foreground !backdrop-blur-xl !shadow-xl",
+          "!rounded-2xl !border !border-white/50 !bg-white/85 !font-sans !text-foreground !backdrop-blur-xl !shadow-xl",
       }}
     />
   </StrictMode>,
@@ -29,7 +29,7 @@ createRoot(container).render(
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     void navigator.serviceWorker.register("/sw.js").catch((error) => {
-      console.warn("[Nma's Kitchen] Service worker registration failed:", error);
+      console.warn("[Food Delivery System] Service worker registration failed:", error);
     });
   });
 }

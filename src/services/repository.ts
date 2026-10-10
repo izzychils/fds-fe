@@ -57,7 +57,7 @@ function persist(next: Database) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch (error) {
     // Quota errors are realistic once review photos are stored as data-URLs.
-    console.error("[Nma's Kitchen] Could not persist the development database.", error);
+    console.error("[Food Delivery System] Could not persist the development database.", error);
   }
 }
 
@@ -117,7 +117,7 @@ export function exportDatabase(): string {
 export function importDatabase(json: string): Database {
   const parsed = JSON.parse(json) as Database;
   if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.foods)) {
-    throw new Error("That file is not a valid Nma's Kitchen data export.");
+    throw new Error("That file is not a valid Food Delivery System data export.");
   }
   db = { ...createSeedDatabase(), ...parsed };
   persist(db);

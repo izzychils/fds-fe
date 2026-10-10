@@ -270,7 +270,7 @@ export function CustomerProfilePage() {
       </GlassCard>
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
-        {/* Desktop account nav — the same sections as the tab strip below,
+        {/* Desktop account nav, the same sections as the tab strip below,
             presented as a sidebar with animated entry. */}
         <UserProfileSidebar
           className="sticky top-24 hidden lg:flex"
@@ -357,7 +357,7 @@ export function CustomerProfilePage() {
               </Button>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Profile photographs are not supported in this build — no media storage provider is
+              Profile photographs are not supported in this build, no media storage provider is
               connected.
             </p>
           </Card>
@@ -653,7 +653,7 @@ export function CustomerProfilePage() {
               />
             </Field>
           </div>
-          <Field label="Landmark" hint="Optional — helps the rider find you." htmlFor="addr-landmark">
+          <Field label="Landmark" hint="Optional, helps the rider find you." htmlFor="addr-landmark">
             <Input
               id="addr-landmark"
               value={addressForm.landmark}

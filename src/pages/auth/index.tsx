@@ -44,17 +44,17 @@ function AuthShell({
   return (
     <div className="app-ambient min-h-dvh">
       <div className="mx-auto grid min-h-dvh w-full max-w-7xl gap-0 lg:grid-cols-2 lg:gap-8 lg:p-6">
-        {/* Dark green brand panel — the reference image used for sign-up */}
+        {/* Dark green brand panel, the reference image used for sign-up */}
         <aside className="relative hidden overflow-hidden lg:block lg:rounded-3xl">
           <img src={heroImage} alt="" className="img-cover absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-b from-primary-deep/92 via-primary-deep/80 to-primary-deep/95" />
           <div className="relative flex h-full flex-col justify-between p-8 text-white">
-            <Link to="/" aria-label="Back to Nma's Kitchen">
+            <Link to="/" aria-label="Back to Food Delivery System">
               <span className="flex items-center gap-2.5">
                 <span className="flex size-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-xl">
                   <ChefHat className="size-5" aria-hidden />
                 </span>
-                <span className="text-base font-extrabold tracking-tight">Nma's Kitchen</span>
+                <span className="text-base font-extrabold tracking-tight">Food Delivery System</span>
               </span>
             </Link>
 
@@ -81,7 +81,7 @@ function AuthShell({
             </div>
 
             <p className="text-xs text-white/55">
-              Development build — authentication is served by a local mock adapter, not a production
+              Development build, authentication is served by a local mock adapter, not a production
               identity service.
             </p>
           </div>
@@ -320,7 +320,7 @@ export function SignUpPage() {
           confirmPassword: form.confirmPassword,
           dietaryPreferences: dietary,
         }),
-      { success: "Account created — welcome to Nma's Kitchen", silentError: true },
+      { success: "Account created, welcome to Food Delivery System", silentError: true },
     );
     if (user) navigate("/app", { replace: true });
     else setFormError("We couldn't create that account. Try a different email address.");
@@ -593,7 +593,7 @@ export function VendorSignUpPage() {
     if (!validateStep(0) || !validateStep(1) || !validateStep(2)) {
       setErrors((prev) => ({ ...prev }));
       setFormError(
-        "Some details still need attention — go back through the steps and fix the highlighted fields.",
+        "Some details still need attention, go back through the steps and fix the highlighted fields.",
       );
       setStep(0);
       return;
@@ -605,7 +605,7 @@ export function VendorSignUpPage() {
           ...form,
           businessPhone: form.businessPhone || form.phone,
         }),
-      { success: "Kitchen registered — awaiting merchant approval", silentError: true },
+      { success: "Kitchen registered, awaiting merchant approval", silentError: true },
     );
     if (result) navigate("/vendor", { replace: true });
     else setFormError("We couldn't register that kitchen. The name may already be in use.");
@@ -716,7 +716,7 @@ export function VendorSignUpPage() {
                 value={form.businessName}
                 onChange={(event) => set("businessName", event.target.value)}
                 invalid={Boolean(errors.businessName)}
-                placeholder="Nma's Kitchen"
+                placeholder="e.g. Mama Cass Kitchen"
               />
             </Field>
             <Field label="Tagline" required error={errors.tagline} htmlFor="vs-tagline">
@@ -809,7 +809,7 @@ export function VendorSignUpPage() {
 
       {step === 2 ? (
         <div className="space-y-4">
-          <p className="rounded-xl border border-primary/25 bg-primary/8 px-3 py-2 text-xs font-medium text-primary">
+          <p className="rounded-xl border border-primary/25 bg-primary/15 px-3 py-2 text-xs font-semibold text-primary-ink">
             You set your own delivery terms. Customers only see dishes that can reach their address,
             and each kitchen's fee is charged separately on multi-vendor orders.
           </p>
@@ -863,16 +863,16 @@ export function VendorSignUpPage() {
             <dl className="mt-2 grid gap-1.5 text-xs sm:grid-cols-2">
               <div className="flex justify-between gap-2">
                 <dt className="text-muted-foreground">Owner</dt>
-                <dd className="font-semibold">{form.fullName || "—"}</dd>
+                <dd className="font-semibold">{form.fullName || "None"}</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted-foreground">Kitchen</dt>
-                <dd className="font-semibold">{form.businessName || "—"}</dd>
+                <dd className="font-semibold">{form.businessName || "None"}</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted-foreground">Location</dt>
                 <dd className="font-semibold">
-                  {form.area ? `${form.area}, ${form.city}` : "—"}
+                  {form.area ? `${form.area}, ${form.city}` : "None"}
                 </dd>
               </div>
               <div className="flex justify-between gap-2">

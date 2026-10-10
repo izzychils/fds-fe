@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0f7a3d" />
-    <title>Offline — Nma's Kitchen</title>
+    <meta name="theme-color" content="#f5b301" />
+    <title>Offline — Food Delivery System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         color-scheme: light;
@@ -18,13 +24,13 @@
         display: grid;
         place-items: center;
         padding: 24px;
-        font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+        font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
           sans-serif;
-        color: #10231a;
+        color: #17140f;
         background:
-          radial-gradient(58rem 32rem at 8% -6%, rgba(24, 150, 92, 0.22), transparent 62%),
-          radial-gradient(46rem 30rem at 96% 4%, rgba(245, 158, 11, 0.16), transparent 60%),
-          linear-gradient(180deg, #f4fbf6, #e7f5ee);
+          radial-gradient(56rem 32rem at 10% -10%, rgba(245, 179, 1, 0.32), transparent 62%),
+          radial-gradient(42rem 28rem at 94% 2%, rgba(245, 158, 11, 0.2), transparent 62%),
+          linear-gradient(180deg, #fdfbf6, #f6f0e4);
       }
       .card {
         position: relative;
@@ -37,7 +43,7 @@
         background: rgba(255, 255, 255, 0.3);
         -webkit-backdrop-filter: blur(24px);
         backdrop-filter: blur(24px);
-        box-shadow: 0 20px 40px rgba(15, 58, 38, 0.14);
+        box-shadow: 0 20px 40px rgba(23, 20, 15, 0.14);
       }
       .mark {
         display: inline-flex;
@@ -47,20 +53,21 @@
         height: 56px;
         margin-bottom: 16px;
         border-radius: 18px;
-        background: #17915b;
-        color: #fff;
+        background: #f5b301;
+        color: #17140f;
         font-size: 26px;
       }
       h1 {
         margin: 0 0 8px;
         font-size: 1.35rem;
-        letter-spacing: -0.01em;
+        font-weight: 800;
+        letter-spacing: -0.025em;
       }
       p {
         margin: 0;
         font-size: 0.9rem;
         line-height: 1.55;
-        color: #4a5d53;
+        color: #574f42;
       }
       button {
         margin-top: 22px;
@@ -68,32 +75,35 @@
         width: 100%;
         font: inherit;
         font-weight: 700;
-        color: #fff;
+        color: #17140f;
         border: 0;
         border-radius: 999px;
-        background: #17915b;
+        background: #f5b301;
         cursor: pointer;
       }
       button:hover {
-        background: #14794c;
+        background: #e0a400;
       }
       .note {
         margin-top: 14px;
         font-size: 0.75rem;
-        color: #6b7d73;
+        color: #7a7161;
       }
     </style>
   </head>
   <body>
     <main class="card">
       <span class="mark" aria-hidden="true">🍲</span>
-      <h1>You're offline</h1>
+      <h1>You are offline</h1>
       <p>
-        Nma's Kitchen needs a connection to load live menus, prices and delivery status. The app shell
-        is cached, so reconnect and everything will pick up exactly where you left off.
+        Food Delivery System needs a connection to load live menus, prices and delivery status. The app
+        shell is cached, so the interface will come back the moment you reconnect.
       </p>
       <button type="button" onclick="window.location.reload()">Try again</button>
-      <p class="note">Your cart and saved addresses are stored on this device.</p>
+      <p class="note">
+        Delivery status shown in the app is simulated in this build: the map tiles are real, the courier
+        position is not.
+      </p>
     </main>
   </body>
 </html>

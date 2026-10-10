@@ -82,7 +82,7 @@ export const riderService = {
       name: input.name.trim(),
       phone: input.phone.trim(),
       vehicle: input.vehicle,
-      plateNumber: input.plateNumber.trim() || "—",
+      plateNumber: input.plateNumber.trim() || "None",
       vendorId: input.vendorId,
       isActive: true,
       isAvailable: true,

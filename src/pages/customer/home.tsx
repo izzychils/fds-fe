@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Bike, Clock, Flame, MapPin, Sparkles, Truck, Utensils } from "lucide-react";
+import { ArrowRight, Bike, Clock, Flame, MapPin, TrendingUp, Truck, Utensils } from "lucide-react";
 import {
+  Avatar,
   Badge,
   Button,
   Card,
@@ -24,7 +25,8 @@ import {
   recommendFoods,
   settingsService,
 } from "@/services";
-import { distanceKm, formatNaira } from "@/lib/utils";
+import { cn, distanceKm, formatNaira } from "@/lib/utils";
+import { cuisineIcon } from "@/lib/cuisine-icons";
 
 export default function CustomerHomePage() {
   const db = useDb();
@@ -97,28 +99,77 @@ export default function CustomerHomePage() {
     .reduce((sum, order) => sum + order.total, 0);
 
   return (
-    <PageContainer className="space-y-8">
-      {/* greeting */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Hello{user ? `, ${user.fullName.split(" ")[0]}` : ""} 👋
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {deliveryAddress
-              ? `Delivering to ${deliveryAddress.label} · ${deliveryAddress.area}, ${deliveryAddress.city}`
-              : "Set a delivery address to see everything that can reach you."}
-          </p>
+    <PageContainer className="space-y-8">      {/* greeting: identity, address and the categories people pick most often,
+          grouped into one panel so the top of the dashboard reads as a summary
+          rather than a heading floating above a search box. */}
+      <GlassCard intensity="cardStrong" className="rounded-[2rem] p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <Avatar name={user?.fullName ?? "Guest"} src={user?.avatarUrl} className="size-14" />
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                Hello
+              </p>
+              <h1 className="truncate text-2xl font-extrabold tracking-tight sm:text-3xl">
+                {user ? user.fullName.split(" ")[0] : "there"}
+              </h1>
+              <p className="mt-1 flex items-start gap-1.5 text-sm text-muted-foreground">
+                <MapPin className="mt-0.5 size-3.5 shrink-0 text-primary-ink" aria-hidden />
+                {deliveryAddress
+                  ? `Delivering to ${deliveryAddress.label} · ${deliveryAddress.area}, ${deliveryAddress.city}`
+                  : "Set a delivery address to see everything that can reach you."}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <LocationControl />
+            <Link to="/foods">
+              <Button size="md">
+                Order food
+                <ArrowRight className="size-4" aria-hidden />
+              </Button>
+            </Link>
+          </div>
         </div>
-        <LocationControl />
-      </div>
 
-      <div className="lg:hidden">
-        <FoodSearchField />
-      </div>
-      <div className="hidden lg:block">
-        <FoodSearchField />
-      </div>
+        {categories.length > 0 ? (
+          <div className="no-scrollbar mt-5 flex gap-2.5 overflow-x-auto pb-1">
+            {categories.slice(0, 7).map((item) => {
+              const Icon = cuisineIcon(item.label);
+              const active = category === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setCategory(active ? null : item.value)}
+                  className={cn(
+                    "flex w-[5.5rem] shrink-0 flex-col items-center gap-2 rounded-3xl border p-3 text-center transition-all",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "border-white/60 bg-white/60 backdrop-blur-xl hover:-translate-y-0.5 hover:bg-white/85",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex size-10 items-center justify-center rounded-2xl",
+                      active ? "bg-white/25" : "bg-primary/20 text-primary-ink",
+                    )}
+                  >
+                    <Icon className="size-5" aria-hidden />
+                  </span>
+                  <span className="truncate text-xs font-bold">{item.label}</span>
+                  <span className="text-[10px] font-semibold opacity-70">
+                    {item.count} {item.count === 1 ? "dish" : "dishes"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </GlassCard>
+
+      <FoodSearchField />
 
       {/* live orders */}
       {liveOrders.length > 0 ? (
@@ -175,7 +226,7 @@ export default function CustomerHomePage() {
           tone="success"
           icon={<Truck className="size-4" aria-hidden />}
         />
-        <StatCard label="Spent with Nma's" value={formatNaira(lifetimeSpend)} tone="primary" />
+        <StatCard label="Lifetime spend" value={formatNaira(lifetimeSpend)} tone="primary" />
         <StatCard
           label="Saved dishes"
           value={db.favorites.filter((favorite) => favorite.userId === user?.id).length}
@@ -202,7 +253,7 @@ export default function CustomerHomePage() {
               <div key={recommendation.entry.food.id} className="flex flex-col gap-2">
                 <FoodCard entry={recommendation.entry} compact />
                 <p className="flex items-start gap-1.5 px-1 text-[11px] font-medium text-muted-foreground">
-                  <Sparkles className="mt-0.5 size-3 shrink-0 text-primary" aria-hidden />
+                  <TrendingUp className="mt-0.5 size-3 shrink-0 text-primary-ink" aria-hidden />
                   {recommendation.reason}
                 </p>
               </div>
@@ -226,21 +277,27 @@ export default function CustomerHomePage() {
         <section>
           <SectionHeading title="Your usual cuisines" subtitle="Based on what you have ordered before." />
           <div className="flex flex-wrap gap-2">
-            {affinityCuisines.map((cuisine, index) => (
-              <Link key={cuisine.id} to={`/foods?cuisine=${cuisine.id}`}>
-                <span className="flex items-center gap-2 rounded-2xl border border-white/50 bg-white/60 px-4 py-3 backdrop-blur transition-colors hover:bg-white/90">
-                  <span className="text-xl" aria-hidden>
-                    {cuisine.emoji}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-bold">{cuisine.name}</span>
-                    <span className="block text-[11px] text-muted-foreground">
-                      #{index + 1} most ordered
+            {affinityCuisines.map((cuisine, index) => {
+              const Icon = cuisineIcon(cuisine.name);
+              return (
+                <Link key={cuisine.id} to={`/foods?cuisine=${cuisine.id}`}>
+                  <span className="flex items-center gap-3 rounded-2xl border border-white/50 bg-white/60 px-4 py-3 backdrop-blur transition-colors hover:bg-white/90">
+                    <span
+                      className="flex size-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground"
+                      aria-hidden
+                    >
+                      <Icon className="size-5" />
+                    </span>
+                    <span>
+                      <span className="block text-sm font-bold">{cuisine.name}</span>
+                      <span className="block text-[11px] text-muted-foreground">
+                        #{index + 1} most ordered
+                      </span>
                     </span>
                   </span>
-                </span>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </section>
       ) : null}

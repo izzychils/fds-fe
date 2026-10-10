@@ -23,11 +23,11 @@ import { useLockBodyScroll } from "@/hooks";
 export type Tone = "primary" | "success" | "warning" | "destructive" | "info" | "muted";
 
 export const TONE_CLASSES: Record<Tone, string> = {
-  primary: "bg-primary/12 text-primary border-primary/25",
-  success: "bg-emerald-500/12 text-emerald-700 border-emerald-500/25",
-  warning: "bg-amber-500/15 text-amber-700 border-amber-500/30",
-  destructive: "bg-red-500/12 text-red-700 border-red-500/25",
-  info: "bg-sky-500/12 text-sky-700 border-sky-500/25",
+  primary: "bg-primary/20 text-primary-ink border-primary/40",
+  success: "bg-success/12 text-success border-success/25",
+  warning: "bg-warning/15 text-warning border-warning/30",
+  destructive: "bg-destructive/12 text-destructive border-destructive/25",
+  info: "bg-info/12 text-info border-info/25",
   muted: "bg-muted text-muted-foreground border-border",
 };
 
@@ -208,7 +208,7 @@ export function Avatar({
   return (
     <span
       className={cn(
-        "inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/12 text-xs font-bold text-primary",
+        "inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/20 text-xs font-extrabold text-primary-ink",
         className,
       )}
       aria-hidden={src ? undefined : true}
@@ -405,7 +405,7 @@ export function Checkbox({
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-2">
           <span className="text-sm font-semibold">{label}</span>
-          {price ? <span className="shrink-0 text-sm font-semibold text-primary">{price}</span> : null}
+          {price ? <span className="shrink-0 text-sm font-bold text-primary-ink">{price}</span> : null}
         </span>
         {description ? (
           <span className="mt-0.5 block text-xs text-muted-foreground">{description}</span>
@@ -847,6 +847,13 @@ export function Pagination({
 
 /* --------------------------------------------------------------- Toolbar */
 
+/**
+ * Dashboard metric tile.
+ *
+ * Icon first and circular, value set large: the same rhythm the reference
+ * dashboard screens use, and it keeps every tile the same height whether it has
+ * an icon, a hint or neither.
+ */
 export function StatCard({
   label,
   value,
@@ -861,20 +868,28 @@ export function StatCard({
   tone?: Tone;
 }) {
   return (
-    <GlassCard intensity="card" className="p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <GlassCard
+      intensity="card"
+      className="p-4 transition-transform duration-300 hover:-translate-y-0.5"
+    >
+      <div className="flex items-start gap-3">
+        {icon ? (
+          <span
+            className={cn(
+              "flex size-10 shrink-0 items-center justify-center rounded-full border",
+              TONE_CLASSES[tone],
+            )}
+          >
+            {icon}
+          </span>
+        ) : null}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
             {label}
           </p>
           <p className="mt-1 text-2xl font-extrabold tracking-tight">{value}</p>
           {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
         </div>
-        {icon ? (
-          <span className={cn("flex size-10 items-center justify-center rounded-xl border", TONE_CLASSES[tone])}>
-            {icon}
-          </span>
-        ) : null}
       </div>
     </GlassCard>
   );

@@ -52,7 +52,7 @@ export function formatNairaCompact(amount: number): string {
 
 export function formatDateTime(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "None";
   return d.toLocaleString("en-NG", {
     day: "2-digit",
     month: "short",
@@ -63,19 +63,19 @@ export function formatDateTime(iso: string): string {
 
 export function formatDate(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "None";
   return d.toLocaleDateString("en-NG", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 export function formatClock(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "None";
   return d.toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" });
 }
 
 export function timeAgo(iso: string): string {
   const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return "—";
+  if (Number.isNaN(then)) return "None";
   const diff = Date.now() - then;
   const mins = Math.round(diff / 60000);
   if (mins < 1) return "just now";
@@ -107,9 +107,9 @@ export function isSameDay(iso: string, reference = new Date()): boolean {
  * account has no uploaded photo: an inline SVG with the person's initials. No
  * network request, no invented photo.
  */
-export function initialsAvatar(name: string, tint = "#0f7a3d"): string {
+export function initialsAvatar(name: string, tint = "#141310"): string {
   const text = initials(name);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="${tint}"/><text x="48" y="61" font-family="Plus Jakarta Sans,Segoe UI,sans-serif" font-size="34" font-weight="700" fill="#ffffff" text-anchor="middle">${text}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="${tint}"/><text x="48" y="61" font-family="Outfit,Segoe UI,sans-serif" font-size="34" font-weight="700" fill="#f5b301" text-anchor="middle">${text}</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 

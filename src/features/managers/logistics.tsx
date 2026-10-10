@@ -206,7 +206,7 @@ export function RidersManager({ scope }: { scope: "vendor" | "platform" }) {
                       )}
                     </Td>
                     <Td>{rider.deliveriesCompleted}</Td>
-                    <Td>{rider.rating > 0 ? rider.rating.toFixed(1) : "—"}</Td>
+                    <Td>{rider.rating > 0 ? rider.rating.toFixed(1) : "None"}</Td>
                     <Td>
                       <div className="flex flex-wrap gap-1">
                         <Badge tone={rider.isActive ? "success" : "muted"}>
@@ -269,7 +269,7 @@ export function RidersManager({ scope }: { scope: "vendor" | "platform" }) {
                     {rider.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </div>
-                <a href={`tel:${rider.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <a href={`tel:${rider.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 text-xs font-bold text-primary-ink">
                   <Phone className="size-3.5" aria-hidden /> {rider.phone}
                 </a>
                 <div className="flex flex-wrap gap-2">
@@ -408,7 +408,7 @@ export function RidersManager({ scope }: { scope: "vendor" | "platform" }) {
           setDeleting(null);
         }}
         title={`Delete ${deleting?.name ?? "rider"}?`}
-        message="Riders with live orders cannot be deleted — deactivate them instead."
+        message="Riders with live orders cannot be deleted, deactivate them instead."
         confirmLabel="Delete rider"
         pending={pending}
       />
@@ -802,7 +802,7 @@ export function OrderDetailView({
                 }}
               />
               <p className="text-[11px] text-muted-foreground">
-                Only valid transitions are offered, and the service rejects anything else — an order
+                Only valid transitions are offered, and the service rejects anything else, an order
                 can never jump from pending straight to delivered.
               </p>
             </GlassCard>

@@ -20,6 +20,9 @@ export default {
           foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
           deep: "hsl(var(--primary-deep) / <alpha-value>)",
           soft: "hsl(var(--primary-soft) / <alpha-value>)",
+          // Use `text-gold-ink` wherever the brand colour must be readable as
+          // text on a light surface; `primary` itself is a background colour.
+          ink: "hsl(var(--gold-ink) / <alpha-value>)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary) / <alpha-value>)",

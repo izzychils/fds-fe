@@ -155,7 +155,7 @@ export function BannersManager() {
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
-          The public carousel renders exactly these banners, in priority order. Order matters — use the
+          The public carousel renders exactly these banners, in priority order. Order matters, use the
           arrows to move a banner up or down.
         </p>
         <Button onClick={() => openDialog(null)}>
@@ -262,7 +262,7 @@ export function BannersManager() {
         open={dialog.open}
         onClose={dialog.onClose}
         title={editing ? `Edit banner` : "Add a banner"}
-        description="Everything on the carousel is editable — title, subtitle, image, button text and destination."
+        description="Everything on the carousel is editable, title, subtitle, image, button text and destination."
         size="lg"
         footer={
           <>
@@ -449,7 +449,7 @@ export function ReviewsManager({ scope, vendorId }: { scope: "vendor" | "platfor
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Reviews" value={stats.total} icon={<Star className="size-4" aria-hidden />} />
-        <StatCard label="Average rating" value={stats.average > 0 ? stats.average.toFixed(1) : "—"} tone="warning" />
+        <StatCard label="Average rating" value={stats.average > 0 ? stats.average.toFixed(1) : "None"} tone="warning" />
         <StatCard label="Verified purchases" value={stats.verified} tone="success" />
         <StatCard label="Awaiting reply" value={stats.unanswered} tone="info" />
       </div>
@@ -1014,7 +1014,7 @@ function CuisineEditor() {
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Renaming a cuisine updates it everywhere it is used — dishes reference cuisines by id.
+        Renaming a cuisine updates it everywhere it is used, dishes reference cuisines by id.
       </p>
     </div>
   );
@@ -1085,7 +1085,7 @@ export function FeesManager() {
             label={feeType === "percentage" ? "Percentage (%)" : "Amount (₦)"}
             hint={
               feeType === "percentage"
-                ? "Applied to the food subtotal only — never to delivery fees."
+                ? "Applied to the food subtotal only, never to delivery fees."
                 : feeType === "fixed"
                   ? "Charged once per order regardless of size."
                   : "Multiplied by the number of items in the order."
@@ -1129,7 +1129,7 @@ export function FeesManager() {
 
           <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] font-medium text-amber-800">
             Changing the policy affects new orders only. Every existing order keeps the fee policy it
-            was placed under — those snapshots are shown here and on each order.
+            was placed under, those snapshots are shown here and on each order.
           </p>
         </Card>
 
@@ -1191,7 +1191,7 @@ export function AuditManager() {
         />
         <StatCard
           label="Latest action"
-          value={entries[0] ? timeAgo(entries[0].at) : "—"}
+          value={entries[0] ? timeAgo(entries[0].at) : "None"}
           tone="success"
         />
       </div>
@@ -1200,7 +1200,7 @@ export function AuditManager() {
         <EmptyState
           icon={<History className="size-5" aria-hidden />}
           title="No activity recorded yet"
-          message="Significant merchant actions — approving kitchens, editing banners, changing fees, managing riders — are logged here."
+          message="Significant merchant actions, approving kitchens, editing banners, changing fees, managing riders, are logged here."
         />
       ) : (
         <Card className="overflow-hidden">

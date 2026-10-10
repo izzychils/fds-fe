@@ -130,7 +130,7 @@ export default function AdminOverviewPage() {
         />
         <StatCard
           label="Average rating"
-          value={averageRating > 0 ? averageRating.toFixed(1) : "—"}
+          value={averageRating > 0 ? averageRating.toFixed(1) : "None"}
           hint={`${reviews.length} reviews across the platform`}
           tone="warning"
           icon={<Star className="size-4" aria-hidden />}
@@ -381,7 +381,7 @@ export default function AdminOverviewPage() {
                   <TrendingUp className="size-4 text-primary" aria-hidden /> Tip
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Open the storefront in a second browser tab while you operate this console — status
+                  Open the storefront in a second browser tab while you operate this console, status
                   changes propagate between same-origin tabs in real time.
                 </p>
               </GlassCard>

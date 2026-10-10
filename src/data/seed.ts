@@ -215,7 +215,7 @@ const vendors: Vendor[] = [
     slug: "verandah-bistro",
     tagline: "Waiting for platform approval",
     description:
-      "New applicant — contemporary West-African small plates and natural wine.",
+      "New applicant, contemporary West-African small plates and natural wine.",
     coverImage: IMG.patio,
     logoText: "VB",
     cuisineIds: ["cui_nigerian", "cui_continental"],
@@ -651,7 +651,7 @@ const foodSeed: FoodSeed[] = [
     vendorId: "vnd_slice",
     name: "Pizzeria Sharing Platter",
     description:
-      "Three half-pizzas — pepperoni, garden and a chef's special — with garlic dip and rocket.",
+      "Three half-pizzas, pepperoni, garden and a chef's special, with garlic dip and rocket.",
     price: 18500,
     image: IMG.partyPlatter,
     cuisineId: "cui_pizza",
@@ -908,7 +908,7 @@ const riders: Rider[] = [
     name: "Blessing Adeyemi",
     phone: "0809 445 2210",
     vehicle: "Bicycle",
-    plateNumber: "—",
+    plateNumber: "None",
     vendorId: null,
     isActive: true,
     isAvailable: false,
@@ -1025,9 +1025,9 @@ const promoCodes: PromoCode[] = [
 ];
 
 const settings: PlatformSettings = {
-  siteName: "Nma's Kitchen",
+  siteName: "Food Delivery System",
   tagline: "Fresh food from kitchens near you, delivered hot.",
-  logoText: "Nma's Kitchen",
+  logoText: "Food Delivery System",
   logoUrl: null,
   contactEmail: "support@nmaskitchen.ng",
   phone: "0800 662 5000",
@@ -1061,7 +1061,7 @@ const banners: Banner[] = [
   },
   {
     id: "bnr_2",
-    badge: "New on Nma's",
+    badge: "New on Food Delivery System",
     title: "Stone-baked pepperoni",
     subtitle: "48-hour fermented dough from Slice & Spice Pizzeria. Personal to family size.",
     image: IMG.pizza,
@@ -1378,7 +1378,7 @@ const reviews: Review[] = [
     vendorId: "vnd_slice",
     orderId: "NMK-10247",
     rating: 4,
-    comment: "Great crust and generous pepperoni. The family size is genuinely huge — good value.",
+    comment: "Great crust and generous pepperoni. The family size is genuinely huge, good value.",
     photos: [],
     isVerifiedPurchase: true,
     vendorReply: null,
@@ -1412,7 +1412,7 @@ const reviews: Review[] = [
     photos: [],
     isVerifiedPurchase: false,
     vendorReply: {
-      text: "Noted — we now send dressing separately on request. Thanks for the feedback!",
+      text: "Noted, we now send dressing separately on request. Thanks for the feedback!",
       at: hoursAgo(20),
     },
     isHidden: false,
@@ -1451,7 +1451,7 @@ export function createSeedDatabase(): Database {
 
 /** Surfaces the demo logins in the sign-in screen. Development only. */
 export const DEMO_ACCOUNTS = [
-  { role: "customer" as const, email: "adaeze@example.com", label: "Customer — Adaeze Okafor" },
-  { role: "vendor" as const, email: "grill@grillrepublic.ng", label: "Vendor — Grill Republic" },
-  { role: "admin" as const, email: "merchant@nmaskitchen.ng", label: "Merchant (Admin) — Nma Odili" },
+  { role: "customer" as const, email: "adaeze@example.com", label: "Customer, Adaeze Okafor" },
+  { role: "vendor" as const, email: "grill@grillrepublic.ng", label: "Vendor, Grill Republic" },
+  { role: "admin" as const, email: "merchant@nmaskitchen.ng", label: "Merchant (Admin), Nma Odili" },
 ];

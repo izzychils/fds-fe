@@ -3,17 +3,18 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   BadgeCheck,
+  BadgePercent,
   Clock,
   Copy,
   Drumstick,
   Eye,
   Flame,
   ListChecks,
+  MessageSquare,
   Package,
   Pencil,
   Plus,
   Search,
-  Sparkles,
   Trash2,
   Utensils,
 } from "lucide-react";
@@ -167,7 +168,7 @@ export function ProteinsManager({ scope, vendorId }: { scope: "vendor" | "platfo
         <EmptyState
           icon={<Drumstick className="size-5" aria-hidden />}
           title="No protein options yet"
-          message="Proteins are the choices a customer makes when customizing a dish — chicken, beef, fish and so on."
+          message="Proteins are the choices a customer makes when customizing a dish, chicken, beef, fish and so on."
           action={
             <Button onClick={() => openDialog(null)}>
               <Plus className="size-4" aria-hidden /> Add the first protein
@@ -504,7 +505,7 @@ export function ExtrasManager({ scope, vendorId }: { scope: "vendor" | "platform
                   <p className="text-sm font-bold">{extra.name}</p>
                   <p className="text-xs text-muted-foreground">{extra.description}</p>
                 </div>
-                <span className="shrink-0 text-sm font-bold text-primary">+{formatNaira(extra.price)}</span>
+                <span className="shrink-0 text-sm font-bold text-primary-ink">+{formatNaira(extra.price)}</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <Badge tone={extra.isAvailable ? "success" : "muted"}>
@@ -756,13 +757,13 @@ export function MenuManager({
                       </div>
                     </Td>
                     {scope === "platform" ? (
-                      <Td className="text-xs">{vendorService.get(food.vendorId)?.name ?? "—"}</Td>
+                      <Td className="text-xs">{vendorService.get(food.vendorId)?.name ?? "None"}</Td>
                     ) : null}
                     <Td>
                       {entry ? <PriceTag entry={entry} size="sm" /> : formatNaira(food.price)}
                       {food.isSeasonalSpecial ? (
                         <Badge tone="warning" className="ml-1">
-                          <Sparkles className="size-3" aria-hidden /> special
+                          <BadgePercent className="size-3" aria-hidden /> special
                         </Badge>
                       ) : null}
                     </Td>
@@ -1274,7 +1275,7 @@ export function DishEditor({
 
   const save = async () => {
     if (!validate()) {
-      toast.error("Some fields need attention — see the highlighted errors.");
+      toast.error("Some fields need attention, see the highlighted errors.");
       if (errors.name || errors.price || errors.description) setTab("basics");
       return;
     }
@@ -1663,9 +1664,9 @@ export function DishEditor({
                     set("proteinSelection", event.target.value as DishFormState["proteinSelection"])
                   }
                 >
-                  <option value="optional">Optional — customer may skip</option>
-                  <option value="required">Required — customer must choose one</option>
-                  <option value="none">Not offered — this dish has no protein choice</option>
+                  <option value="optional">Optional, customer may skip</option>
+                  <option value="required">Required, customer must choose one</option>
+                  <option value="none">Not offered, this dish has no protein choice</option>
                 </Select>
               </Field>
 
@@ -1711,7 +1712,7 @@ export function DishEditor({
                       label={protein.name}
                       description={
                         protein.appliesToCategory
-                          ? `${protein.description || "—"} · ${protein.appliesToCategory} only`
+                          ? `${protein.description || "None"} · ${protein.appliesToCategory} only`
                           : protein.description || "Available for all categories"
                       }
                       price={protein.price === 0 ? "Included" : `+${formatNaira(protein.price)}`}
@@ -1791,7 +1792,7 @@ export function DishEditor({
                       label={extra.name}
                       description={
                         extra.appliesToCategory
-                          ? `${extra.description || "—"} · ${extra.appliesToCategory} only`
+                          ? `${extra.description || "None"} · ${extra.appliesToCategory} only`
                           : extra.description || "Available for all categories"
                       }
                       price={`+${formatNaira(extra.price)}`}
@@ -1916,7 +1917,7 @@ export function DishEditor({
                 ) : null}
                 {form.sizes.length === 0 ? (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    No sizes — the dish is sold at a single price.
+                    No sizes, the dish is sold at a single price.
                   </p>
                 ) : (
                   <ul className="mt-3 space-y-2">
@@ -2002,7 +2003,7 @@ export function DishEditor({
             </p>
             {previewEntry ? (
               <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <Sparkles className="size-3" aria-hidden />
+                <MessageSquare className="size-3" aria-hidden />
                 {previewEntry.ratingCount} review{previewEntry.ratingCount === 1 ? "" : "s"} · last
                 edited {timeAgo(existing?.updatedAt ?? new Date().toISOString())}
               </p>

@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
+  ArrowRight,
   BadgeCheck,
   Bike,
   ChefHat,
   Compass,
   Mail,
   MapPin,
+  Percent,
   Phone,
   Search,
   ShieldCheck,
   Store,
+  Truck,
+  Users,
   Utensils,
 } from "lucide-react";
 import {
@@ -25,6 +29,7 @@ import {
 } from "@/components/ui";
 import { PageContainer } from "@/components/layout/public";
 import { settingsService } from "@/services";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 /* --------------------------------------------------------------- about */
@@ -144,7 +149,7 @@ export function ContactPage() {
       <GlassCard intensity="card" className="space-y-4 rounded-3xl p-5">
         <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-800">
           This form is part of the frontend build. No mail provider is configured, so submitting it
-          will not send an email — use the contact details above.
+          will not send an email, use the contact details above.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Your name" required error={errors.name} htmlFor="contact-name">
@@ -222,6 +227,13 @@ const FAQS: Array<{ id: string; question: string; answer: string }> = [
 ];
 
 export function HelpPage() {
+  const location = useLocation();
+  /**
+   * Links such as the footer's "Refund policy" arrive as `/help#refunds`.
+   * Without this the page scrolls to a closed accordion, which reads as a
+   * broken link, so the targeted answer is opened and ringed on arrival.
+   */
+  const targeted = location.hash.replace(/^#/, "");
   return (
     <PageContainer className="max-w-3xl space-y-6">
       <SectionHeading title="Help centre" subtitle="Answers to the questions we get most often." />
@@ -230,7 +242,11 @@ export function HelpPage() {
           <details
             key={faq.id}
             id={faq.id}
-            className="group rounded-2xl border border-border bg-card p-4 open:shadow-md"
+            open={targeted === faq.id}
+            className={cn(
+              "group scroll-mt-28 rounded-2xl border border-border bg-card p-4 open:shadow-md",
+              targeted === faq.id && "border-primary/50 ring-2 ring-primary/30",
+            )}
           >
             <summary className="cursor-pointer list-none text-sm font-bold marker:hidden">
               <span className="flex items-center justify-between gap-3">
@@ -256,6 +272,157 @@ export function HelpPage() {
           <Link to="/app/orders">
             <Button size="sm" variant="outline">
               View my orders
+            </Button>
+          </Link>
+        </div>
+      </GlassCard>
+    </PageContainer>
+  );
+}
+
+/* --------------------------------------------------------------- partners */
+
+/**
+ * The partnership page the header and footer link to.
+ *
+ * It describes the two ways to work with the platform (kitchens and riders) and
+ * the approval gate that sits in front of both. Nothing here promises earnings:
+ * this is a frontend build, and the copy says so where it matters.
+ */
+export function PartnersPage() {
+  return (
+    <PageContainer className="max-w-5xl space-y-8">
+      <div className="text-center">
+        <span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]">
+          <Store className="size-3.5" aria-hidden /> Partners
+        </span>
+        <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Grow with Food Delivery System
+        </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+          Kitchens cook and deliver on their own terms. Riders carry those orders. The platform sets one
+          fee model and one order status model so every partner is measured the same way.
+        </p>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <GlassCard intensity="card" className="rounded-3xl p-6">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <ChefHat className="size-6" aria-hidden />
+          </span>
+          <h2 className="mt-4 text-xl font-extrabold">Kitchens and food businesses</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Publish dishes with photos, prices and preparation times, configure proteins, extras and
+            serving sizes, track live stock, publish seasonal specials and reply to customer reviews.
+            You decide your own delivery fee, delivery radius and serving hours.
+          </p>
+          <ul className="mt-4 space-y-2 text-sm">
+            {[
+              "Your own menu, inventory and pricing",
+              "Your own riders, or none at all",
+              "Live orders and a single status timeline",
+              "Reviews you can reply to in public",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2">
+                <BadgeCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <Link to="/vendor-signup" className="mt-5 inline-block">
+            <Button>
+              Register a kitchen <ArrowRight className="size-4" aria-hidden />
+            </Button>
+          </Link>
+        </GlassCard>
+
+        <GlassCard intensity="card" className="rounded-3xl p-6">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <Bike className="size-6" aria-hidden />
+          </span>
+          <h2 className="mt-4 text-xl font-extrabold">Riders and delivery teams</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Riders are managed inside the kitchen that assigns them. A kitchen adds its own riders,
+            keeps their contact details current, activates or deactivates them and assigns a rider to a
+            specific order. The platform merchant can see every rider across the marketplace.
+          </p>
+          <ul className="mt-4 space-y-2 text-sm">
+            {[
+              "Assigned per order by the kitchen",
+              "One shared delivery status timeline",
+              "Delivery details scoped to the order",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2">
+                <BadgeCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-xs text-muted-foreground">
+            Applications run through a kitchen, not through a public form, in this build.
+          </p>
+        </GlassCard>
+      </div>
+
+      <Card className="rounded-3xl p-6">
+        <h2 className="flex items-center gap-2 text-lg font-extrabold">
+          <ShieldCheck className="size-5 text-primary" aria-hidden /> How approval works
+        </h2>
+        <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              icon: Store,
+              title: "1. Register",
+              body: "Create an account and enter your business details. You can prepare your menu straight away.",
+            },
+            {
+              icon: Users,
+              title: "2. Review",
+              body: "The merchant checks the business before it can sell. Pending kitchens are not visible to customers.",
+            },
+            {
+              icon: Truck,
+              title: "3. Go live",
+              body: "Once approved, your dishes join the marketplace and orders start arriving in your console.",
+            },
+          ].map((step) => (
+            <li key={step.title} className="rounded-2xl border border-border bg-card p-4">
+              <step.icon className="size-5 text-primary" aria-hidden />
+              <p className="mt-2 text-sm font-bold">{step.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </Card>
+
+      <GlassCard intensity="card" className="rounded-3xl p-6">
+        <h2 className="flex items-center gap-2 text-lg font-extrabold">
+          <Percent className="size-5 text-primary" aria-hidden /> Fees and payouts
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          The platform charges one service fee on every completed purchase, configured by the merchant
+          as a percentage of the food subtotal, a flat fee per order or a per item charge. Delivery fees
+          belong to the kitchen and are shown separately at checkout. The fee policy in force when the
+          order is placed is stored on that order, so a later change never rewrites history.
+        </p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          No payment provider is connected in this development build, so no money moves and no payout
+          schedule exists yet. Payouts are a backend and payment provider concern.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Link to="/help#vendors">
+            <Button variant="outline" size="sm">
+              Selling questions
+            </Button>
+          </Link>
+          <Link to="/help#fees">
+            <Button variant="outline" size="sm">
+              How fees work
+            </Button>
+          </Link>
+          <Link to="/contact">
+            <Button variant="outline" size="sm">
+              Talk to us
             </Button>
           </Link>
         </div>
@@ -308,13 +475,13 @@ export function TermsPage() {
         {
           heading: "1. Who we are",
           body: [
-            "Nma's Kitchen operates a marketplace that connects customers with independent food vendors. We are not the kitchen: each vendor prepares and fulfils its own dishes and sets its own prices, delivery fee, delivery radius, preparation time and serving hours.",
+            "Food Delivery System operates a marketplace that connects customers with independent food vendors. We are not the kitchen: each vendor prepares and fulfils its own dishes and sets its own prices, delivery fee, delivery radius, preparation time and serving hours.",
           ],
         },
         {
           heading: "2. Accounts and roles",
           body: [
-            "There are three account types: customer, vendor and platform merchant (admin). Customer and vendor accounts can be created through the public sign-up flows. Merchant access is never granted through public registration — it is assigned administratively, because it carries platform-wide authority.",
+            "There are three account types: customer, vendor and platform merchant (admin). Customer and vendor accounts can be created through the public sign-up flows. Merchant access is never granted through public registration, it is assigned administratively, because it carries platform-wide authority.",
             "You are responsible for keeping your credentials secure. In this development build authentication is handled by a local mock adapter and must be replaced by the production identity service before launch.",
           ],
         },

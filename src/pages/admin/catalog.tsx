@@ -65,7 +65,7 @@ export function AdminVendorsPage() {
       {
         success:
           next === "approved"
-            ? "Kitchen approved — it can now go live"
+            ? "Kitchen approved, it can now go live"
             : next === "suspended"
               ? "Kitchen suspended"
               : "Kitchen moved back to pending",
@@ -364,7 +364,7 @@ export function AdminCustomersPage() {
     <div className="space-y-5">
       <DashboardHeading
         title="Accounts"
-        description="Customers, vendor owners and administrators. Merchant access is granted here — never through public sign-up."
+        description="Customers, vendor owners and administrators. Merchant access is granted here, never through public sign-up."
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
@@ -442,7 +442,7 @@ export function AdminCustomersPage() {
                   </Badge>
                 </Td>
                 <Td className="text-xs">
-                  {user.vendorId ? vendorService.get(user.vendorId)?.name ?? "—" : "—"}
+                  {user.vendorId ? vendorService.get(user.vendorId)?.name ?? "None" : "None"}
                 </Td>
                 <Td>
                   {db.orders.filter((order) => order.customerId === user.id).length}
@@ -497,7 +497,7 @@ export function AdminCustomersPage() {
               onClick={() => {
                 if (!editingUser) return;
                 void run(() => authService.setRole(editingUser.id, newRole, actor), {
-                  success: "Role updated — the account must sign in again for it to take effect",
+                  success: "Role updated, the account must sign in again for it to take effect",
                   onSuccess: () => roleDialog.onClose(),
                   silentError: true,
                 });
@@ -515,9 +515,9 @@ export function AdminCustomersPage() {
               value={newRole}
               onChange={(event) => setNewRole(event.target.value as typeof newRole)}
             >
-              <option value="customer">Customer — can order food</option>
-              <option value="vendor">Vendor — manages one kitchen</option>
-              <option value="admin">Merchant admin — full platform access</option>
+              <option value="customer">Customer, can order food</option>
+              <option value="vendor">Vendor, manages one kitchen</option>
+              <option value="admin">Merchant admin, full platform access</option>
             </Select>
           </Field>
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] font-medium text-amber-800">

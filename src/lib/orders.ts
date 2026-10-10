@@ -175,7 +175,7 @@ export function calcPlatformFee(
       return { amount, basis: `₦${feeValue} per item × ${itemCount}` };
     }
     default:
-      return { amount: 0, basis: "—" };
+      return { amount: 0, basis: "None" };
   }
 }
 

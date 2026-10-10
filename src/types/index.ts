@@ -1,5 +1,5 @@
 /**
- * Nma's Kitchen — shared domain types.
+ * Food Delivery System — shared domain types.
  *
  * These interfaces are the single source of truth for the client-side data
  * layer AND act as the integration contract for the future backend: every

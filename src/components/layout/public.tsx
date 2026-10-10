@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
+  ArrowRight,
   ChefHat,
   Compass,
   Heart,
@@ -26,7 +27,19 @@ import { toast } from "sonner";
 
 /* ------------------------------------------------------------------ brand */
 
-export function Logo({ className, showText = true }: { className?: string; showText?: boolean }) {
+/**
+ * The wordmark. The mark is a solid yellow tile with ink on top, which is the
+ * one place the brand yellow is used at full strength on every surface.
+ */
+export function Logo({
+  className,
+  showText = true,
+  onInk = false,
+}: {
+  className?: string;
+  showText?: boolean;
+  onInk?: boolean;
+}) {
   const { logoUrl } = settingsService.get();
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
@@ -39,10 +52,22 @@ export function Logo({ className, showText = true }: { className?: string; showT
       </span>
       {showText ? (
         <span className="flex min-w-0 flex-col leading-tight">
-          <span className="truncate text-base font-extrabold tracking-tight">
+          <span
+            className={cn(
+              "truncate text-base font-extrabold tracking-tight",
+              onInk ? "text-white" : "text-foreground",
+            )}
+          >
             Food Delivery System
           </span>
-          <span className="text-[11px] font-medium text-muted-foreground">Food, delivered hot</span>
+          <span
+            className={cn(
+              "text-[11px] font-medium",
+              onInk ? "text-white/55" : "text-muted-foreground",
+            )}
+          >
+            Food, delivered hot
+          </span>
         </span>
       ) : null}
     </span>
@@ -265,148 +290,174 @@ export function LocationControl({ className }: { className?: string }) {
 
 /* ----------------------------------------------------------------- header */
 
-const PUBLIC_LINKS = [
+const PUBLIC_LINKS: Array<{ to: string; label: string; end?: boolean }> = [
   { to: "/", label: "Home", end: true },
   { to: "/foods", label: "Browse food" },
+  { to: "/partners", label: "Partners" },
   { to: "/#how-it-works", label: "How it works" },
   { to: "/vendor-signup", label: "Sell on Food Delivery System" },
 ];
 
 /**
- * Desktop header routes: the `/foods` entry is swapped for the mega-menu, which
- * offers the same route plus live cuisine/category shortcuts.
+ * Desktop header routes. `/foods` and `/partners` are dropped here because the
+ * mega-menu already renders both as its two triggers, and repeating one of them
+ * as a plain link beside it would read as a duplicate destination.
  */
-const DESKTOP_LINKS = PUBLIC_LINKS.filter((link) => link.to !== "/foods");
+const DESKTOP_LINKS = PUBLIC_LINKS.filter(
+  (link) => link.to !== "/foods" && link.to !== "/partners",
+);
 
+/**
+ * The public header.
+ *
+ * Guests get discovery only: brand, navigation, search and a single "Order now"
+ * call to action. Anything that belongs behind an account (the dashboard, the
+ * cart, the delivery address) is rendered only once a session exists, so the
+ * landing page never advertises a dashboard the visitor cannot open yet.
+ */
 export function PublicHeader() {
   const { user } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mobileSearch, setMobileSearch] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setMenuOpen(false);
-    setMobileSearch(false);
-  }, [location.pathname]);
+    setSearchOpen(false);
+  }, [location.pathname, location.hash]);
 
   return (
     <header className="sticky top-0 z-40 w-full">
-      <div className="w-full px-0">
-        <GlassCard intensity="cardStrong" className="flex flex-col gap-3 rounded-none p-3">
-          <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-3 sm:gap-4 sm:px-5">
-            <Link to="/" aria-label="Food Delivery System home" className="shrink-0">
-              <Logo showText={false} className="sm:hidden" />
-              <Logo className="hidden sm:flex" />
+      <GlassCard intensity="cardStrong" className="flex w-full flex-col rounded-none border-x-0 border-t-0 py-3">
+        <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 sm:px-6">
+          <Link to="/" aria-label="Food Delivery System home" className="shrink-0">
+            <Logo showText={false} className="sm:hidden" />
+            <Logo className="hidden sm:flex" />
+          </Link>
+
+          {/* Every destination sits on the logo's line, never underneath it. The
+              mega-menu takes the slot directly after Home. */}
+          <nav aria-label="Primary" className="hidden flex-1 items-center gap-0.5 xl:flex">
+            {DESKTOP_LINKS.map((link, index) => (
+              <Fragment key={link.to}>
+                {index === 1 ? <HeaderBrowseMenu /> : null}
+                <NavLink to={link.to} end={link.end} className={navLinkClass(link.to)}>
+                  {link.label}
+                </NavLink>
+              </Fragment>
+            ))}
+          </nav>
+
+          <div className="ml-auto flex shrink-0 items-center gap-2 xl:ml-0">
+            <button
+              type="button"
+              onClick={() => setSearchOpen((prev) => !prev)}
+              aria-label={searchOpen ? "Close search" : "Search dishes"}
+              aria-expanded={searchOpen}
+              className="inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 text-foreground backdrop-blur-xl transition-colors hover:bg-white/80"
+            >
+              {searchOpen ? <X className="size-4" /> : <Search className="size-4" />}
+            </button>
+
+            <Link to="/foods" className="hidden sm:block">
+              <Button size="sm">
+                Order now
+                <ArrowRight className="size-3.5" aria-hidden />
+              </Button>
             </Link>
 
-            {/* Desktop nav on same line as logo */}
-            <nav aria-label="Primary" className="hidden flex-1 items-center gap-1 xl:flex">
-              {DESKTOP_LINKS.map((link, index) => (
-                <Fragment key={link.to}>
-                  {index === 1 ? <HeaderBrowseMenu /> : null}
-                  <NavLink
-                    to={link.to.startsWith("/#") ? link.to : link.to}
-                    end={link.end}
-                    onClick={(e) => {
-                      if (link.to.startsWith("/#")) {
-                        e.preventDefault();
-                        const id = link.to.substring(2);
-                        const element = document.getElementById(id);
-                        if (element) {
-                          element.scrollIntoView({ behavior: "smooth" });
-                        }
-                      }
-                    }}
-                    className={({ isActive }) =>
-                      cn(
-                        "rounded-full px-4 py-2.5 text-[15px] font-semibold transition-colors",
-                        isActive && !link.to.includes("#")
-                          ? "bg-primary/12 text-primary"
-                          : "text-foreground/75 hover:bg-white/60 hover:text-foreground",
-                      )
-                    }
-                  >
-                    {link.label}
-                  </NavLink>
-                </Fragment>
-              ))}
-            </nav>
-
-            <div className="ml-auto flex items-center gap-1.5 sm:gap-2 xl:ml-0">
-              <button
-                type="button"
-                onClick={() => setMobileSearch((prev) => !prev)}
-                aria-label="Toggle search"
-                aria-expanded={mobileSearch}
-                className="inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 backdrop-blur-xl transition-colors hover:bg-white/75"
-              >
-                {mobileSearch ? <X className="size-4" /> : <Search className="size-4" />}
-              </button>
-
-              <Link to={user ? "/app" : "/sign-in?next=/app"}>
-                <Button size="sm" variant="primary">
-                  Order Now
+            {user ? (
+              <>
+                <Link
+                  to="/app/cart"
+                  aria-label="Your cart"
+                  className="relative inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 backdrop-blur-xl transition-colors hover:bg-white/80"
+                >
+                  <ShoppingBag className="size-4" aria-hidden />
+                  <CartBadge />
+                </Link>
+                <AccountMenu />
+              </>
+            ) : (
+              <Link to="/sign-in" className="hidden sm:block">
+                <Button size="sm" variant="glass">
+                  Sign in
                 </Button>
               </Link>
+            )}
 
-              <button
-                type="button"
-                onClick={() => setMenuOpen((prev) => !prev)}
-                aria-label="Toggle navigation menu"
-                aria-expanded={menuOpen}
-                className="inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 backdrop-blur-xl transition-colors hover:bg-white/75 xl:hidden"
-              >
-                {menuOpen ? <X className="size-4" /> : <MenuIcon className="size-4" />}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label="Toggle navigation menu"
+              aria-expanded={menuOpen}
+              className="inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/55 backdrop-blur-xl transition-colors hover:bg-white/80 xl:hidden"
+            >
+              {menuOpen ? <X className="size-4" /> : <MenuIcon className="size-4" />}
+            </button>
           </div>
+        </div>
 
-          {mobileSearch ? (
-            <div className="mx-auto w-full max-w-7xl px-3 sm:px-5">
-              <FoodSearchField size="sm" autoFocus />
-              {user ? (
-                <div className="mt-2">
-                  <LocationControl className="w-full" />
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+        {searchOpen ? (
+          <div className="mx-auto mt-3 w-full max-w-7xl px-4 sm:px-6">
+            <FoodSearchField size="sm" autoFocus />
+            {user ? (
+              <div className="mt-2">
+                <LocationControl className="w-full" />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
-          {menuOpen ? (
-            <nav aria-label="Mobile" className="mx-auto grid w-full max-w-7xl gap-1 border-t border-white/40 px-3 pt-3 sm:px-5 xl:hidden">
-              {PUBLIC_LINKS.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={(e) => {
-                    if (link.to.startsWith("/#")) {
-                      e.preventDefault();
-                      const id = link.to.substring(2);
-                      const element = document.getElementById(id);
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth" });
-                        setMenuOpen(false);
-                      }
-                    }
-                  }}
-                  className="rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/60"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {!user ? (
-                <Link
-                  to="/sign-in"
-                  className="rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/60 sm:hidden"
-                >
-                  Sign in
-                </Link>
-              ) : null}
-            </nav>
-          ) : null}
-        </GlassCard>
-      </div>
+        {menuOpen ? (
+          <nav
+            aria-label="Mobile"
+            className="mx-auto mt-3 grid w-full max-w-7xl gap-1 border-t border-white/40 px-4 pt-3 sm:px-6 xl:hidden"
+          >
+            {PUBLIC_LINKS.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/60"
+              >
+                {link.label}
+              </Link>
+            ))}
+            {!user ? (
+              <Link
+                to="/sign-in"
+                className="rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/60 sm:hidden"
+              >
+                Sign in
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
+      </GlassCard>
     </header>
+  );
+}
+
+/** Shared header-link treatment: yellow pill when active, glass on hover. */
+function navLinkClass(to: string) {
+  const isSection = to.includes("#");
+  return ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
+      isActive && !isSection
+        ? "bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+        : "text-foreground/75 hover:bg-white/70 hover:text-foreground",
+    );
+}
+
+/** Cart counter used by the header bag button. */
+function CartBadge() {
+  const count = useCartCount();
+  if (count === 0) return null;
+  return (
+    <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+      {count}
+    </span>
   );
 }
 
@@ -419,22 +470,23 @@ const FOOTER_LINKS: Array<{ title: string; links: Array<{ to: string; label: str
       { to: "/about", label: "About us" },
       { to: "/contact", label: "Contact" },
       { to: "/help", label: "Help centre" },
+      { to: "/#how-it-works", label: "How ordering works" },
     ],
   },
   {
     title: "Order",
     links: [
       { to: "/foods", label: "Browse food" },
-      { to: "/sign-in?next=/app/orders", label: "Track an order" },
-      { to: "/sign-in?next=/app/profile", label: "Your profile" },
+      { to: "/app/orders", label: "Track an order" },
+      { to: "/app/favorites", label: "Saved dishes" },
     ],
   },
   {
     title: "Partners",
     links: [
+      { to: "/partners", label: "Partnership overview" },
       { to: "/vendor-signup", label: "Become a vendor" },
-      { to: "/sign-in?next=/vendor", label: "Vendor sign in" },
-      { to: "/help#vendors", label: "Vendor help" },
+      { to: "/help#vendors", label: "Selling and approvals" },
     ],
   },
   {
@@ -447,76 +499,70 @@ const FOOTER_LINKS: Array<{ title: string; links: Array<{ to: string; label: str
   },
 ];
 
+/**
+ * The public footer.
+ *
+ * Set on ink instead of glass: it closes the page the way the reference design
+ * does, and the near-black surface is the one place where the yellow accent can
+ * be used as a link colour with full contrast.
+ */
 export function PublicFooter() {
   const { canInstall, installed, promptInstall } = useInstallPrompt();
   return (
-    <footer className="mt-16 border-t border-white/40 bg-white/35 backdrop-blur-xl">
-      <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+    <footer className="mt-16 bg-primary-deep text-white/85">
+      <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-1">
-            <Logo />
-            <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              A marketplace of independent kitchens. Order a dish, and we'll show you who's cooking it.
+            <Logo onInk />
+            <p className="mt-3 max-w-xs text-sm text-white/65">
+              A marketplace of independent kitchens. Order a dish, and we will show you who is cooking
+              it.
             </p>
             <div className="mt-4">
               {installed ? (
-                <Badge tone="success">App installed</Badge>
+                <Badge tone="primary">
+                  <Smartphone className="size-3" aria-hidden /> App installed
+                </Badge>
               ) : canInstall ? (
                 <Button size="sm" onClick={() => void promptInstall()}>
                   <Smartphone className="size-4" aria-hidden />
                   Install the app
                 </Button>
               ) : (
-                <a href="#install">
-                  <Button size="sm" variant="outline">
+                <Link to="/#install">
+                  <Button size="sm" variant="glass">
                     <Smartphone className="size-4" aria-hidden />
                     Install the app
                   </Button>
-                </a>
+                </Link>
               )}
             </div>
           </div>
           {FOOTER_LINKS.map((group) => (
             <nav key={group.title} aria-label={group.title}>
-              <h2 className="text-sm font-bold">{group.title}</h2>
-              <ul className="mt-3 space-y-2">
+              <h2 className="text-sm font-extrabold uppercase tracking-wider text-primary">
+                {group.title}
+              </h2>
+              <ul className="mt-4 space-y-2.5">
                 {group.links.map((link) => (
                   <li key={`${group.title}-${link.to}-${link.label}`}>
-                    {link.to.includes("#") ? (
-                      <a
-                        href={link.to}
-                        onClick={(e) => {
-                          if (link.to.includes("#")) {
-                            e.preventDefault();
-                            const id = link.to.split("#")[1];
-                            const element = document.getElementById(id);
-                            if (element) {
-                              element.scrollIntoView({ behavior: "smooth" });
-                            }
-                          }
-                        }}
-                        className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link
-                        to={link.to}
-                        className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                      >
-                        {link.label}
-                      </Link>
-                    )}
+                    <Link
+                      to={link.to}
+                      className="text-sm text-white/70 transition-colors hover:text-primary"
+                    >
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             </nav>
           ))}
         </div>
-        <div className="mt-10 flex flex-col gap-2 border-t border-white/50 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-2 border-t border-white/15 pt-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Food Delivery System. All prices in Nigerian naira.</p>
           <p>
-            Development build: payments, GPS tracking and authentication are served by local mock adapters, not live services.
+            Development build: payments, GPS tracking and authentication are served by local mock
+            adapters, not live services.
           </p>
         </div>
       </div>
@@ -526,8 +572,18 @@ export function PublicFooter() {
 
 /* ---------------------------------------------------------- mobile tab bar */
 
+/**
+ * Mobile quick navigation.
+ *
+ * Only rendered for a signed-in customer: every tab points at an authenticated
+ * route, so showing it to a visitor would advertise a dashboard they cannot
+ * open. Guests keep the brand, the nav and search instead.
+ */
 export function MobileTabBar() {
   const cartCount = useCartCount();
+  const { user } = useSession();
+  if (!user) return null;
+
   const tabs = [
     { to: "/app", label: "Home", icon: Home },
     { to: "/foods", label: "Discover", icon: Compass },
@@ -548,12 +604,23 @@ export function MobileTabBar() {
               className={({ isActive }) =>
                 cn(
                   "flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold transition-colors",
-                  isActive ? "text-primary" : "text-muted-foreground",
+                  isActive ? "text-foreground" : "text-muted-foreground",
                 )
               }
             >
-              <tab.icon className="size-5" aria-hidden />
-              {tab.label}
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={cn(
+                      "flex size-8 items-center justify-center rounded-full transition-colors",
+                      isActive && "bg-primary text-primary-foreground",
+                    )}
+                  >
+                    <tab.icon className="size-4.5" aria-hidden />
+                  </span>
+                  {tab.label}
+                </>
+              )}
             </NavLink>
           </li>
         ))}
@@ -563,19 +630,28 @@ export function MobileTabBar() {
             className={({ isActive }) =>
               cn(
                 "flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold transition-colors",
-                isActive ? "text-primary" : "text-muted-foreground",
+                isActive ? "text-foreground" : "text-muted-foreground",
               )
             }
           >
-            <span className="relative">
-              <ShoppingBag className="size-5" aria-hidden />
-              {cartCount > 0 ? (
-                <span className="absolute -right-2 -top-1.5 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-                  {cartCount}
+            {({ isActive }) => (
+              <>
+                <span
+                  className={cn(
+                    "relative flex size-8 items-center justify-center rounded-full transition-colors",
+                    isActive && "bg-primary text-primary-foreground",
+                  )}
+                >
+                  <ShoppingBag className="size-4.5" aria-hidden />
+                  {cartCount > 0 ? (
+                    <span className="absolute -right-1.5 -top-1 flex min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-bold text-background">
+                      {cartCount}
+                    </span>
+                  ) : null}
                 </span>
-              ) : null}
-            </span>
-            Cart
+                Cart
+              </>
+            )}
           </NavLink>
         </li>
       </ul>
@@ -657,12 +733,34 @@ export function AccountMenu() {
   );
 }
 
-/** Wraps every public page with the ambient background and mobile spacing. */
+/**
+ * Wraps every public page with the ambient background and mobile spacing.
+ *
+ * A hash in the URL (for example `/#how-it-works` from the header, or `/help#refunds`)
+ * is scrolled to once the destination page has rendered. The element may not
+ * exist on the first frame after navigation, so the lookup is retried across a
+ * couple of animation frames before giving up.
+ */
 export function PublicLayout() {
   const location = useLocation();
   useEffect(() => {
+    const id = location.hash.replace(/^#/, "");
+    if (id) {
+      let frames = 0;
+      let raf = 0;
+      const attempt = () => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+        if (frames++ < 12) raf = requestAnimationFrame(attempt);
+      };
+      raf = requestAnimationFrame(attempt);
+      return () => cancelAnimationFrame(raf);
+    }
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   return (
     <div className="app-ambient flex min-h-dvh flex-col">

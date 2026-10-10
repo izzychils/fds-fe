@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   Star,
   Store,
+  Utensils,
 } from "lucide-react";
 import type { FoodWithVendor } from "@/types";
 import {
@@ -22,6 +23,7 @@ import {
   Textarea,
 } from "@/components/ui";
 import { cn, formatNaira } from "@/lib/utils";
+import { cuisineIcon } from "@/lib/cuisine-icons";
 import { useDb, useSession } from "@/hooks";
 import { cartService, favoriteService, isSoldOut } from "@/services";
 import { toast } from "sonner";
@@ -112,15 +114,17 @@ export function FoodCard({ entry, compact = false }: { entry: FoodWithVendor; co
     toast.success(added ? "Saved to favourites" : "Removed from favourites");
   };
 
+  const CuisineIcon = cuisine ? cuisineIcon(cuisine.name) : Utensils;
+
   return (
     <>
       <article
         className={cn(
-          "group relative flex flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/55 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-deep/10",
+          "group relative flex flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary-deep/10",
           unavailable && "opacity-70",
         )}
       >
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+        <div className="relative aspect-[5/4] overflow-hidden bg-muted">
           <Link to={`/foods/${food.id}`} aria-label={food.name}>
             <img
               src={food.image}
@@ -185,7 +189,11 @@ export function FoodCard({ entry, compact = false }: { entry: FoodWithVendor; co
             <span className="inline-flex items-center gap-1">
               <Clock className="size-3" aria-hidden /> {food.prepTimeMinutes} min
             </span>
-            {cuisine ? <span>{cuisine.emoji} {cuisine.name}</span> : null}
+            {cuisine ? (
+              <span className="inline-flex items-center gap-1">
+                <CuisineIcon className="size-3" aria-hidden /> {cuisine.name}
+              </span>
+            ) : null}
             {food.calories ? <span>{food.calories} kcal</span> : null}
             {ratingCount > 0 ? <span>{ratingCount} reviews</span> : null}
           </div>
@@ -195,7 +203,7 @@ export function FoodCard({ entry, compact = false }: { entry: FoodWithVendor; co
               {food.dietary.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary"
+                  className="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary-ink"
                 >
                   {tag}
                 </span>
@@ -236,7 +244,7 @@ export function CategoryChips({
   allLabel = "All",
   ariaLabel = "Filter by category",
 }: {
-  items: Array<{ value: string; label: string; emoji?: string; count?: number }>;
+  items: Array<{ value: string; label: string; count?: number }>;
   value: string | null;
   onChange: (next: string | null) => void;
   allLabel?: string;
@@ -253,34 +261,38 @@ export function CategoryChips({
         aria-pressed={value === null}
         onClick={() => onChange(null)}
         className={cn(
-          "shrink-0 rounded-full border px-3.5 py-2 text-sm font-semibold transition-all",
+          "shrink-0 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all",
           value === null
-            ? "border-primary bg-primary text-primary-foreground shadow-sm"
-            : "border-white/50 bg-white/55 backdrop-blur hover:bg-white/80",
+            ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+            : "border-white/60 bg-white/60 backdrop-blur hover:bg-white/85",
         )}
       >
         {allLabel}
       </button>
-      {items.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          aria-pressed={value === item.value}
-          onClick={() => onChange(item.value === value ? null : item.value)}
-          className={cn(
-            "shrink-0 rounded-full border px-3.5 py-2 text-sm font-semibold transition-all",
-            value === item.value
-              ? "border-primary bg-primary text-primary-foreground shadow-sm"
-              : "border-white/50 bg-white/55 backdrop-blur hover:bg-white/80",
-          )}
-        >
-          {item.emoji ? <span aria-hidden>{item.emoji} </span> : null}
-          {item.label}
-          {item.count !== undefined ? (
-            <span className="ml-1.5 text-xs font-medium opacity-70">{item.count}</span>
-          ) : null}
-        </button>
-      ))}
+      {items.map((item) => {
+        const Icon = cuisineIcon(item.label);
+        const active = value === item.value;
+        return (
+          <button
+            key={item.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(active ? null : item.value)}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all",
+              active
+                ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+                : "border-white/60 bg-white/60 backdrop-blur hover:bg-white/85",
+            )}
+          >
+            <Icon className="size-4" aria-hidden />
+            {item.label}
+            {item.count !== undefined ? (
+              <span className="text-xs font-medium opacity-70">{item.count}</span>
+            ) : null}
+          </button>
+        );
+      })}
     </div>
   );
 }

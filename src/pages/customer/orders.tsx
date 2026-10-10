@@ -398,7 +398,7 @@ export function CustomerOrderDetailPage() {
             <p className="text-[11px] text-muted-foreground">
               {order.paymentStatus === "paid"
                 ? "Confirmed by the payment provider."
-                : "No payment provider is connected in this build — nothing has been charged."}
+                : "No payment provider is connected in this build, nothing has been charged."}
             </p>
             <p className="text-[11px] text-muted-foreground">
               Platform fee policy in force:{" "}

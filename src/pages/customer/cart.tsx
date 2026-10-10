@@ -101,7 +101,7 @@ export function CartPage() {
     }
     setPromoError(null);
     setAppliedPromo(promo.code);
-    toast.success(`${promo.code} applied — ${promo.percentOff}% off`);
+    toast.success(`${promo.code} applied, ${promo.percentOff}% off`);
   };
 
   if (!user) {
@@ -125,7 +125,7 @@ export function CartPage() {
         <EmptyState
           icon={<ShoppingBag className="size-5" aria-hidden />}
           title="Your cart is empty"
-          message="Browse dishes and add something — you can customise proteins and extras before checking out."
+          message="Browse dishes and add something, you can customise proteins and extras before checking out."
           action={
             <Link to="/foods">
               <Button>Browse dishes</Button>
@@ -156,7 +156,7 @@ export function CartPage() {
         <div className="rounded-2xl border border-border bg-muted/50 px-4 py-3 text-xs text-muted-foreground">
           This order spans <strong className="text-foreground">{groups.length} kitchens</strong>. They
           will be prepared and tracked separately, and each kitchen's delivery fee is charged
-          individually — the total below reflects that.
+          individually, the total below reflects that.
         </div>
       ) : null}
 
@@ -191,7 +191,7 @@ export function CartPage() {
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
-                        <Link to={`/foods/${item.foodId}`} className="text-sm font-bold hover:text-primary">
+                        <Link to={`/foods/${item.foodId}`} className="text-sm font-bold hover:text-primary-ink">
                           {item.name}
                         </Link>
                         <button
@@ -288,7 +288,7 @@ export function CartPage() {
                   {promoError}
                 </p>
               ) : appliedPromo ? (
-                <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
+                <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-primary-ink">
                   <BadgeCheck className="size-3.5" aria-hidden /> {appliedPromo} applied
                 </p>
               ) : null}
@@ -514,7 +514,7 @@ export function CheckoutPage() {
     // Development payment transport — nothing is charged and the status stays
     // "pending" until a real provider confirms it server-side.
     const intent = await createDevelopmentPaymentIntent({ amount: order.total, orderId: order.id });
-    toast.warning("Order placed — payment not yet confirmed", {
+    toast.warning("Order placed, payment not yet confirmed", {
       description: `${intent.message} (${intent.provider})`,
       duration: 7000,
     });
@@ -615,7 +615,7 @@ export function CheckoutPage() {
               <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-700" aria-hidden />
               <p className="text-[11px] font-medium text-amber-800">
                 No payment provider is connected in this build. Placing the order records it as{" "}
-                <strong>payment pending</strong> — no card is charged and no transfer is verified. A
+                <strong>payment pending</strong>, no card is charged and no transfer is verified. A
                 production build must confirm payment server-side before treating an order as paid.
               </p>
             </div>

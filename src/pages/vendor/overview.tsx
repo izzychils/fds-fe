@@ -85,7 +85,7 @@ export default function VendorOverviewPage() {
     <div className="space-y-6">
       <DashboardHeading
         title={`${vendor.name} dashboard`}
-        description="Your kitchen only — you cannot see or modify another vendor's dishes, orders, riders or settings."
+        description="Your kitchen only, you cannot see or modify another vendor's dishes, orders, riders or settings."
         action={
           <>
             <Link to="/vendor/menu/new">
@@ -167,7 +167,7 @@ export default function VendorOverviewPage() {
         />
         <StatCard
           label="Rating"
-          value={rating.count > 0 ? rating.rating.toFixed(1) : "—"}
+          value={rating.count > 0 ? rating.rating.toFixed(1) : "None"}
           hint={`${rating.count} review${rating.count === 1 ? "" : "s"}`}
           tone="warning"
           icon={<Star className="size-4" aria-hidden />}

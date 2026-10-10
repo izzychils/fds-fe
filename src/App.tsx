@@ -12,6 +12,7 @@ import {
   ContactPage,
   HelpPage,
   NotFoundPage,
+  PartnersPage,
   PrivacyPage,
   TermsPage,
 } from "@/pages/public/static-pages";
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/foods" element={<BrowseFoodPage />} />
           <Route path="/foods/:foodId" element={<FoodDetailPage />} />
+          <Route path="/partners" element={<PartnersPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/help" element={<HelpPage />} />
