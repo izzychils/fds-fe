@@ -413,7 +413,7 @@ export function PublicHeader() {
           aria-label="Mobile"
           className="absolute inset-x-0 top-full z-20 mx-auto w-full max-w-7xl px-4 pb-3 sm:px-6 xl:hidden"
         >
-          <div className="grid gap-1 rounded-2xl border border-white/60 bg-white/90 p-2 shadow-2xl shadow-black/25 backdrop-blur-2xl dark:border-white/25 dark:bg-black/85">
+          <div className="grid gap-1 rounded-2xl border border-white/40 bg-white/55 p-2 text-foreground shadow-2xl shadow-black/20 backdrop-blur-2xl dark:border-white/20 dark:bg-black/50">
             {PUBLIC_LINKS.map((link) => (
               <Link
                 key={link.to}
