@@ -3,13 +3,16 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import {
   ArrowRight,
   ChefHat,
+  Clock,
   Compass,
   Heart,
   Home,
   LayoutDashboard,
   LogOut,
+  Mail,
   MapPin,
   Menu as MenuIcon,
+  Phone,
   Receipt,
   Search,
   ShoppingBag,
@@ -463,40 +466,19 @@ function CartBadge() {
 
 /* ----------------------------------------------------------------- footer */
 
-const FOOTER_LINKS: Array<{ title: string; links: Array<{ to: string; label: string }> }> = [
-  {
-    title: "Food Delivery System",
-    links: [
-      { to: "/about", label: "About us" },
-      { to: "/contact", label: "Contact" },
-      { to: "/help", label: "Help centre" },
-      { to: "/#how-it-works", label: "How ordering works" },
-    ],
-  },
-  {
-    title: "Order",
-    links: [
-      { to: "/foods", label: "Browse food" },
-      { to: "/app/orders", label: "Track an order" },
-      { to: "/app/favorites", label: "Saved dishes" },
-    ],
-  },
-  {
-    title: "Partners",
-    links: [
-      { to: "/partners", label: "Partnership overview" },
-      { to: "/vendor-signup", label: "Become a vendor" },
-      { to: "/help#vendors", label: "Selling and approvals" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { to: "/terms", label: "Terms of service" },
-      { to: "/privacy", label: "Privacy policy" },
-      { to: "/help#refunds", label: "Refund policy" },
-    ],
-  },
+const FOOTER_LINKS: Array<{ to: string; label: string }> = [
+  { to: "/foods", label: "Browse food" },
+  { to: "/#how-it-works", label: "How ordering works" },
+  { to: "/app/orders", label: "Track an order" },
+  { to: "/partners", label: "Partnership overview" },
+  { to: "/vendor-signup", label: "Become a vendor" },
+  { to: "/help#vendors", label: "Selling and approvals" },
+  { to: "/about", label: "About us" },
+  { to: "/contact", label: "Contact" },
+  { to: "/help", label: "Help centre" },
+  { to: "/help#refunds", label: "Refund policy" },
+  { to: "/terms", label: "Terms of service" },
+  { to: "/privacy", label: "Privacy policy" },
 ];
 
 /**
@@ -504,15 +486,45 @@ const FOOTER_LINKS: Array<{ title: string; links: Array<{ to: string; label: str
  *
  * Set on ink instead of glass: it closes the page the way the reference design
  * does, and the near-black surface is the one place where the yellow accent can
- * be used as a link colour with full contrast.
+ * be used as a link colour with full contrast. The four columns are the ones the
+ * reference draws — brand, opening hours, contact details and a subscribe field —
+ * and the page links run underneath them so nothing became unreachable when the
+ * link columns were folded into a single strip.
  */
 export function PublicFooter() {
   const { canInstall, installed, promptInstall } = useInstallPrompt();
+  const settings = settingsService.get();
+  const db = useDb();
+  const [email, setEmail] = useState("");
+
+  /** The plate that peeks in from the corner, when a kitchen has published one. */
+  const peek = db.foods.find((food) => food.isAvailable)?.image ?? "/foods/pepperoni-pizza.jpg";
+
+  /**
+   * There is no mailing provider in this build, so the form validates the address
+   * and says plainly that nothing was sent rather than pretending to subscribe.
+   */
+  const subscribe = (event: FormEvent) => {
+    event.preventDefault();
+    if (!email.trim()) {
+      toast.error("Enter an email address first.");
+      return;
+    }
+    toast.info("Subscribe us is not connected to a mailing provider in this development build.");
+  };
+
   return (
-    <footer className="mt-16 bg-primary-deep text-white/85">
-      <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-1">
+    <footer className="relative mt-16 overflow-hidden bg-primary-deep text-white/85">
+      <img
+        src={peek}
+        alt=""
+        aria-hidden
+        loading="lazy"
+        className="pointer-events-none absolute -bottom-20 -left-16 hidden size-56 rounded-full object-cover opacity-60 lg:block"
+      />
+      <div className="relative mx-auto w-full max-w-7xl px-4 py-14 sm:px-6">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
             <Logo onInk />
             <p className="mt-3 max-w-xs text-sm text-white/65">
               A marketplace of independent kitchens. Order a dish, and we will show you who is cooking
@@ -529,37 +541,104 @@ export function PublicFooter() {
                   Install the app
                 </Button>
               ) : (
-                <Link to="/#install">
-                  <Button size="sm" variant="glass">
-                    <Smartphone className="size-4" aria-hidden />
-                    Install the app
-                  </Button>
-                </Link>
+                <p className="inline-flex items-center gap-2 text-xs text-white/60">
+                  <Smartphone className="size-3.5" aria-hidden />
+                  This browser installs web apps from its own menu.
+                </p>
               )}
             </div>
           </div>
-          {FOOTER_LINKS.map((group) => (
-            <nav key={group.title} aria-label={group.title}>
-              <h2 className="text-sm font-extrabold uppercase tracking-wider text-primary">
-                {group.title}
-              </h2>
-              <ul className="mt-4 space-y-2.5">
-                {group.links.map((link) => (
-                  <li key={`${group.title}-${link.to}-${link.label}`}>
-                    <Link
-                      to={link.to}
-                      className="text-sm text-white/70 transition-colors hover:text-primary"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
+
+          <div>
+            <h2 className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-primary">
+              <Clock className="size-4" aria-hidden /> Opening hours
+            </h2>
+            <p className="mt-4 text-sm text-white/70">{settings.supportHours}</p>
+            <p className="mt-2 text-xs text-white/50">
+              Kitchens publish their own hours on their pages, and an order is only accepted while the
+              kitchen cooking it is open.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-primary">
+              <MapPin className="size-4" aria-hidden /> Contact us
+            </h2>
+            <ul className="mt-4 space-y-2.5 text-sm text-white/70">
+              <li>{settings.address}</li>
+              <li>
+                <a
+                  href={`tel:${settings.phone.replace(/\s+/g, "")}`}
+                  className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+                >
+                  <Phone className="size-3.5" aria-hidden />
+                  {settings.phone}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${settings.contactEmail}`}
+                  className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+                >
+                  <Mail className="size-3.5" aria-hidden />
+                  {settings.contactEmail}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-primary">
+              <Mail className="size-4" aria-hidden /> Subscribe us
+            </h2>
+            <p className="mt-4 text-sm text-white/65">
+              New dishes and new kitchens, at most once a month. Unsubscribe from any message.
+            </p>
+            <form
+              onSubmit={subscribe}
+              className="mt-4 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 py-1.5 pl-4 pr-1.5 backdrop-blur-xl"
+            >
+              <label htmlFor="footer-email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="footer-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="Email address"
+                className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/45 focus:outline-none"
+              />
+              <button
+                type="submit"
+                aria-label="Subscribe"
+                className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-white"
+              >
+                <ArrowRight className="size-4" aria-hidden />
+              </button>
+            </form>
+          </div>
         </div>
-        <div className="mt-12 flex flex-col gap-2 border-t border-white/15 pt-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Food Delivery System. All prices in Nigerian naira.</p>
+
+        <nav
+          aria-label="Footer"
+          className="mt-12 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/15 pt-6 text-sm"
+        >
+          {FOOTER_LINKS.map((link) => (
+            <Link
+              key={`${link.to}-${link.label}`}
+              to={link.to}
+              className="text-white/65 transition-colors hover:text-primary"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-6 flex flex-col gap-2 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} {settings.siteName}. All prices in Nigerian naira.
+          </p>
           <p>
             Development build: payments, GPS tracking and authentication are served by local mock
             adapters, not live services.

@@ -2,72 +2,74 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  BadgeCheck,
   Bike,
   ChefHat,
-  Clock,
-  Download,
-  Heart,
-  Leaf,
-  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
   Quote,
-  Search,
-  ShieldCheck,
-  ShoppingBag,
-  Smartphone,
   Star,
-  Store,
-  Truck,
-  Utensils,
   UtensilsCrossed,
 } from "lucide-react";
-import { Avatar, Badge, Button, EmptyState, GlassCard, Rating } from "@/components/ui";
-import { CategoryChips, FoodCard } from "@/components/food";
-import { BannerCarousel } from "@/components/banners";
+import { Avatar, Button, GlassCard } from "@/components/ui";
 import { PageContainer } from "@/components/layout/public";
-import { useDb, useDbMemo, useInstallPrompt, useSession } from "@/hooks";
-import { bannerService, foodService, recommendFoods, reviewService, settingsService } from "@/services";
-import { formatNaira } from "@/lib/utils";
-import { RatingSummaryPanel } from "@/components/reviews";
+import { useDbMemo } from "@/hooks";
+import { cuisineService, foodService, reviewService, settingsService } from "@/services";
+import { cn } from "@/lib/utils";
 
 /**
- * The four steps shown under "How ordering works".
+ * The public landing page.
  *
- * They mirror the real flow in the app: dishes are discovered first, customised
- * with the options the kitchen actually configured, tracked through one shared
- * status model, then reviewed by the customer who received them.
+ * This is deliberately a storefront, not a dashboard: it sells the service and
+ * hands the reader off to the menu. Nothing that a signed-in account owns
+ * belongs here — no prices, no per-dish records, no live account figures — so
+ * the page reads as the same brand as `inspo/landing page.jpeg` rather than as
+ * a screen of the app. The one rule that shapes every block below: photographs
+ * are shown as photographs, and any number that appears is real and explained.
  */
-const HOW_IT_WORKS = [
+
+/** The three promises under "Why choose our food" — one line each, as in the reference. */
+const PROMISES = [
   {
-    icon: Search,
-    title: "Find a dish",
-    body: "Search by name, ingredient, cuisine or category. You choose the food first, the kitchen comes second.",
+    icon: ChefHat,
+    title: "Quality food",
+    body: "Only kitchens approved by the platform cook here, and every dish lists its own ingredients.",
   },
   {
     icon: UtensilsCrossed,
-    title: "Customise it",
-    body: "Pick a protein, add extras, choose the size and leave instructions for the kitchen.",
+    title: "Super taste",
+    body: "Make a dish yours with the proteins and extras its kitchen actually offers.",
   },
   {
     icon: Bike,
-    title: "Track delivery",
-    body: "Follow every stage from confirmed to on the way, with one timeline shared by every role.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Rate it",
-    body: "After delivery you can review the dish and attach a photo to help the next customer.",
+    title: "Fast delivery",
+    body: "Follow your order from confirmed to your door, stage by stage.",
   },
 ];
 
-/** The yellow brush stroke that sits under the highlighted word in the h1. */
-function BrushUnderline() {
+/** Cuisines shown per page in the popular-foods rail. */
+const PAGE_SIZE = 3;
+
+/** Photographs used when the catalogue is still empty (first run, cleared data). */
+const FALLBACK_PHOTOS = [
+  "/foods/steak-and-eggs.jpg",
+  "/foods/pepperoni-pizza.jpg",
+  "/foods/burger-wings-fries.jpg",
+  "/foods/birria-tacos.jpg",
+  "/foods/steak-shawarma.jpg",
+  "/foods/party-burger-platter.jpg",
+  "/foods/sandwich-platter.jpg",
+  "/foods/bacon-cheeseburger.jpg",
+];
+
+/** The yellow brush stroke the reference design draws under a heading word. */
+function Brush({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 200 14"
       preserveAspectRatio="none"
       aria-hidden
-      className="absolute inset-x-0 -bottom-1 h-2.5 w-full text-primary"
+      className={cn("absolute inset-x-0 -bottom-1.5 h-2.5 w-full text-primary", className)}
     >
       <path
         d="M2 9c34-6 76-8 118-5 24 2 48 4 78 1"
@@ -80,638 +82,431 @@ function BrushUnderline() {
   );
 }
 
+/** Centred section heading with one brush-underlined word. */
+function SectionTitle({
+  lead,
+  highlight,
+  id,
+  align = "center",
+}: {
+  lead: string;
+  highlight: string;
+  id?: string;
+  align?: "center" | "start";
+}) {
+  return (
+    <h2
+      id={id}
+      className={cn(
+        "scroll-mt-28 text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl",
+        align === "center" ? "text-center" : "text-left",
+      )}
+    >
+      {lead}{" "}
+      <span className="relative inline-block">
+        {highlight}
+        <Brush />
+      </span>
+    </h2>
+  );
+}
+
+/**
+ * A circular rating row.
+ *
+ * A dish is only rated once somebody has reviewed it, so an unrated dish shows
+ * its review count instead of a fabricated star score.
+ */
+function Stars({
+  value,
+  count,
+  showValue = true,
+  className,
+}: {
+  value: number;
+  count: number;
+  showValue?: boolean;
+  className?: string;
+}) {
+  return (
+    <span className={cn("inline-flex items-center gap-1.5", className)}>
+      <span className="flex gap-0.5" aria-hidden>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={cn(
+              "size-3 sm:size-3.5",
+              star <= Math.round(value)
+                ? "fill-primary text-primary"
+                : "text-muted-foreground/35",
+            )}
+          />
+        ))}
+      </span>
+      {showValue ? (
+        <span className="text-[11px] font-semibold text-muted-foreground">
+          {count > 0 ? `${value.toFixed(1)} (${count})` : value > 0 ? value.toFixed(1) : "New"}
+        </span>
+      ) : null}
+      <span className="sr-only">
+        {count > 0
+          ? `Rated ${value.toFixed(1)} out of 5 from ${count} ${count === 1 ? "review" : "reviews"}`
+          : "Not yet rated"}
+      </span>
+    </span>
+  );
+}
+
 export default function LandingPage() {
-  const db = useDb();
-  const { user } = useSession();
-  const { canInstall, installed, promptInstall, supported } = useInstallPrompt();
-  const [category, setCategory] = useState<string | null>(null);
-
   const settings = settingsService.get();
-  const banners = bannerService.listActive();
+  const [page, setPage] = useState(0);
+  const [quote, setQuote] = useState(0);
 
-  const popular = useDbMemo(() => foodService.popular(8));
-  const recent = useDbMemo(() => foodService.recent(2));
+  /** Every distinct photograph on sale, in popularity order. */
+  const photos = useDbMemo(() => {
+    const seen = new Set<string>();
+    const list: string[] = [];
+    for (const entry of foodService.popular(24)) {
+      if (seen.has(entry.food.image)) continue;
+      seen.add(entry.food.image);
+      list.push(entry.food.image);
+    }
+    return list;
+  });
+  const shot = (index: number) => photos[index] ?? FALLBACK_PHOTOS[index % FALLBACK_PHOTOS.length];
 
-  /** The two photographs used in the hero: one large, one in the floating card. */
-  const heroDishes = useDbMemo(() => {
-    const available = foodService.listDecorated().filter((entry) => entry.food.isAvailable);
-    const lead = popular[0] ?? available[0] ?? null;
-    const second = available.find((entry) => entry.food.id !== lead?.food.id) ?? null;
-    return { lead, second };
+  /**
+   * The cuisine cards in the popular rail: a cuisine only appears once it has a
+   * dish on sale, and it carries the rating of its best-reviewed dish so the
+   * stars always describe something real.
+   */
+  const cuisines = useDbMemo(() => {
+    const decorated = foodService.listDecorated().filter((entry) => entry.food.isAvailable);
+    return cuisineService
+      .listActive()
+      .map((cuisine) => {
+        const dishes = decorated.filter((entry) => entry.food.cuisineId === cuisine.id);
+        const lead = [...dishes].sort((a, b) => b.rating - a.rating || b.ratingCount - a.ratingCount)[0];
+        return { cuisine, count: dishes.length, lead };
+      })
+      .filter((group) => group.count > 0 && group.lead)
+      .sort((a, b) => b.count - a.count);
   });
 
-  const recommendations = useDbMemo(
-    () => recommendFoods({ userId: user?.id ?? null, limit: 4 }),
-    [user?.id],
-  );
-
-  const verifiedReviews = useDbMemo(() =>
-    reviewService.visible().filter((review) => review.isVerifiedPurchase).slice(0, 3),
-  );
-
-  const overallSummary = useDbMemo(() => {
+  /** Customer quotes: verified purchases first, since those are the defensible ones. */
+  const quotes = useDbMemo(() => {
     const visible = reviewService.visible();
-    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<1 | 2 | 3 | 4 | 5, number>;
-    for (const review of visible) {
-      const key = Math.round(review.rating) as 1 | 2 | 3 | 4 | 5;
-      distribution[key] = (distribution[key] ?? 0) + 1;
-    }
-    return {
-      rating: visible.length
-        ? Math.round((visible.reduce((sum, review) => sum + review.rating, 0) / visible.length) * 10) /
-          10
-        : 0,
-      count: visible.length,
-      distribution,
-    };
+    const verified = visible.filter((review) => review.isVerifiedPurchase);
+    return verified.length > 0 ? verified : visible;
   });
 
-  const categories = useDbMemo(() => {
-    const counts = new Map<string, number>();
-    for (const entry of foodService.listDecorated()) {
-      if (!entry.food.isAvailable) continue;
-      counts.set(entry.food.category, (counts.get(entry.food.category) ?? 0) + 1);
-    }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .map(([value, count]) => ({ value, label: value, count }));
-  });
-
-  const featuredCategory = useDbMemo(() => {
-    const all = foodService.listDecorated().filter((entry) => entry.food.isAvailable);
-    if (!category) return all.slice(0, 4);
-    return all.filter((entry) => entry.food.category === category).slice(0, 4);
-  }, [category]);
-
-  const kitchenCount = useDbMemo(() => db.vendors.filter((vendor) => vendor.status === "approved").length);
-  const dishCount = useDbMemo(() => db.foods.filter((food) => food.isAvailable).length);
-
-  const hero = heroDishes.lead;
-  const secondary = heroDishes.second;
+  const pageCount = Math.max(1, Math.ceil(cuisines.length / PAGE_SIZE));
+  const shelf = cuisines.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  const active = quotes.length > 0 ? quotes[quote % quotes.length] : null;
 
   return (
-    <div className="pb-4">
-      {/* --------------------------------------------------------------- hero */}
+    <div className="overflow-hidden">
+      {/* ------------------------------------------------------------- hero */}
       <section className="relative">
-        <div className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:pt-14">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
+        <div className="mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 lg:pt-12">
+          <div className="grid items-center gap-4 lg:grid-cols-2 lg:gap-12">
             <div className="reveal-up">
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-foreground backdrop-blur-xl">
-                <Heart className="size-3.5 text-foreground" aria-hidden />
-                Recommended kitchens near you
+              <span className="flex items-center gap-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-primary-ink sm:text-xs">
+                <span className="h-px w-6 bg-primary-ink sm:w-9" aria-hidden />
+                {settings.siteName}
               </span>
 
-              <h1 className="mt-6 text-[2.7rem] font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-[4.15rem]">
+              <h1 className="mt-3 text-[1.6rem] font-extrabold leading-[1.06] tracking-tight sm:mt-5 sm:text-4xl lg:text-[3.5rem]">
                 We serve delicious{" "}
-                <span className="relative inline-block whitespace-nowrap">
+                <span className="relative inline-block text-primary-ink">
                   food
-                  <BrushUnderline />
-                </span>{" "}
-                delivered hot
+                  <Brush />
+                </span>
               </h1>
 
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                {settings.tagline} Search any dish, customise it with your own protein and extras, then
-                follow your delivery through every stage. Prices in naira, nothing added at checkout.
+              <p className="mt-3 max-w-xl text-xs leading-relaxed text-muted-foreground sm:mt-5 sm:text-base">
+                {settings.tagline} Search a dish, make it yours, and follow it until it reaches your
+                door.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link to="/foods">
-                  <Button size="lg" className="text-base">
-                    Order now
-                    <ArrowRight className="size-5" aria-hidden />
-                  </Button>
-                </Link>
-                <Link to="/#how-it-works">
-                  <Button size="lg" variant="glass" className="text-base">
-                    How it works
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Trust strip: kept directly under the actions so it reads as part
-                  of the hero rather than a separate, low band. */}
-              <dl className="mt-9 grid grid-cols-3 gap-3">
-                {[
-                  {
-                    label: "Average delivery",
-                    value: `${settings.defaultDeliveryMinutes} min`,
-                    icon: Clock,
-                  },
-                  {
-                    label: "Customer rating",
-                    value: overallSummary.rating ? `${overallSummary.rating}/5` : "New",
-                    icon: Star,
-                  },
-                  { label: "Kitchens live", value: String(kitchenCount), icon: Store },
-                ].map((stat) => (
-                  <GlassCard
-                    key={stat.label}
-                    intensity="card"
-                    className="flex flex-col gap-1 rounded-2xl p-3.5"
-                  >
-                    {/* Labels wrap rather than truncate: at phone widths the
-                        three cards are about 100px each, and "AVERAG…" tells
-                        the reader nothing. */}
-                    <dt className="flex items-start gap-1.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-muted-foreground">
-                      <stat.icon className="mt-px size-3.5 shrink-0 text-primary" aria-hidden />
-                      <span>{stat.label}</span>
-                    </dt>
-                    <dd className="text-2xl font-extrabold tracking-tight">{stat.value}</dd>
-                  </GlassCard>
-                ))}
-              </dl>
+              <Link to="/foods" className="mt-4 inline-flex sm:mt-7">
+                <Button size="lg" className="rounded-full px-6 text-sm sm:px-8 sm:text-base">
+                  Order now
+                  <ArrowRight className="size-4" aria-hidden />
+                </Button>
+              </Link>
             </div>
 
-            {/* Two photographs only: the hero plate and the floating dish card. */}
-            <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+            {/* One plate: the arc runs off the right edge, thumbnails sit on it. */}
+            <div className="relative mx-auto w-full max-w-[15rem] sm:max-w-sm lg:max-w-lg">
               <span
-                className="blob blob-hero absolute -right-3 top-6 h-[74%] w-[80%] bg-primary"
                 aria-hidden
+                className="pointer-events-none absolute -right-[18%] -top-[14%] h-[122%] w-[124%] rounded-full bg-primary/85"
               />
-              {hero ? (
-                <Link
-                  to={`/foods/${hero.food.id}`}
-                  className="group relative z-10 block overflow-hidden rounded-[2.5rem] border-4 border-white/70 shadow-2xl shadow-primary-deep/25"
-                >
-                  <img
-                    src={hero.food.image}
-                    alt={hero.food.name}
-                    loading="eager"
-                    className="img-cover aspect-[4/5] transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
-                  <span className="absolute inset-x-5 bottom-5 flex items-baseline justify-between gap-3 text-white">
-                    <span className="text-lg font-extrabold">{hero.food.name}</span>
-                    <span className="text-lg font-extrabold">
-                      {formatNaira(hero.effectivePrice)}
-                    </span>
-                  </span>
-                </Link>
-              ) : (
-                <div className="relative z-10 aspect-[4/5] w-full rounded-[2.5rem] border-4 border-white/70 bg-muted" />
-              )}
-
-              {/* Anchored above the hero's own price label so the two never
-                  stack on top of each other. */}
-              <GlassCard
-                intensity="cardStrong"
-                className="animate-float absolute -left-4 top-14 z-20 w-[15rem] rounded-3xl p-3"
-              >
-                {secondary ? (
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={secondary.food.image}
-                      alt={secondary.food.name}
-                      loading="lazy"
-                      className="size-14 shrink-0 rounded-2xl object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold">{secondary.food.name}</p>
-                      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="font-bold text-foreground">
-                          {formatNaira(secondary.effectivePrice)}
-                        </span>
-                        <Rating value={secondary.rating} />
-                      </p>
-                    </div>
-                  </div>
-                ) : null}
-              </GlassCard>
-
-              <GlassCard
-                intensity="cardStrong"
-                className="animate-float absolute -top-4 right-4 z-20 flex items-center gap-2 rounded-full px-4 py-2.5"
-              >
-                <Star className="size-4 fill-primary text-primary" aria-hidden />
-                <span className="text-sm font-extrabold">
-                  {overallSummary.rating || "New"}
-                  {overallSummary.count > 0 ? ` from ${overallSummary.count} reviews` : ""}
-                </span>
-              </GlassCard>
+              <div className="relative z-10 aspect-square overflow-hidden rounded-full border-[5px] border-white/85 shadow-2xl shadow-primary-deep/25">
+                <img src={shot(0)} alt="" loading="eager" className="img-cover" />
+              </div>
+              <ul className="absolute right-0 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-2 sm:gap-3">
+                {[1, 2, 3].map((index, position) => (
+                  <li
+                    key={index}
+                    className={cn(
+                      "size-9 overflow-hidden rounded-full border-2 border-white/90 shadow-lg sm:size-12",
+                      position === 1 && "-ml-4 sm:-ml-6",
+                    )}
+                  >
+                    <img src={shot(index)} alt="" loading="lazy" className="img-cover" />
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* --------------------------------------------------------- highlights */}
-      {banners.length > 0 ? (
-        <PageContainer className="py-10">
-          <BannerCarousel banners={banners} />
-        </PageContainer>
-      ) : null}
-
-      {/* ---------------------------------------------------- most popular */}
-      <PageContainer className="pt-4">
-        <div className="mx-auto mb-7 max-w-xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]">
-            <Utensils className="size-3.5" aria-hidden /> Most popular food
-          </span>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Dishes people are ordering right now
-          </h2>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Marked popular by their own kitchens, never a paid placement. {dishCount} dishes across{" "}
-            {kitchenCount} kitchens.
-          </p>
-        </div>
-
-        <CategoryChips
-          items={categories}
-          value={category}
-          onChange={setCategory}
-          allLabel="Everything"
-        />
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredCategory.map((entry) => (
-            <FoodCard key={entry.food.id} entry={entry} />
-          ))}
-        </div>
-
-        {featuredCategory.length === 0 ? (
-          <EmptyState
-            title="Nothing in this category yet"
-            message="Kitchens publish dishes continuously. Try another category or browse everything."
-            action={
-              <Link to="/foods">
-                <Button>Browse all dishes</Button>
-              </Link>
-            }
-          />
-        ) : null}
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {popular
-            .filter(
-              (entry) => !featuredCategory.some((shown) => shown.food.id === entry.food.id),
-            )
-            .slice(0, 4)
-            .map((entry) => (
-              <FoodCard key={entry.food.id} entry={entry} compact />
-            ))}
-        </div>
-
-        <div className="mt-8 flex justify-center">
-          <Link to="/foods">
-            <Button size="lg" variant="glass">
-              See the full menu
-              <ArrowRight className="size-4" aria-hidden />
-            </Button>
-          </Link>
-        </div>
-      </PageContainer>
-
-      {/* ----------------------------------------------------- personalised */}
-      <PageContainer className="py-10">
-        <GlassCard intensity="cardStrong" className="overflow-hidden rounded-[2rem] p-6 lg:p-8">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-            <div>
-              <Badge tone="primary">
-                <ShieldCheck className="size-3" aria-hidden />
-                {user ? "Picked for you" : "Your account"}
-              </Badge>
-              <h2 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">
-                {user
-                  ? `Welcome back, ${user.fullName.split(" ")[0]}`
-                  : "Sign in and the menu follows your taste"}
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {user
-                  ? "These suggestions come from your order history, favourites and dietary preferences. Every card states why it was chosen."
-                  : "Create an account to get suggestions from your order history, save favourites, track deliveries live and review what you ate. Ordering, customisation and tracking all live behind that sign in."}
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                {user ? (
-                  <Link to="/app">
-                    <Button>
-                      Open my dashboard
-                      <ArrowRight className="size-4" aria-hidden />
-                    </Button>
-                  </Link>
-                ) : (
-                  <>
-                    <Link to="/sign-up">
-                      <Button>
-                        Create a free account
-                        <ArrowRight className="size-4" aria-hidden />
-                      </Button>
-                    </Link>
-                    <Link to="/sign-in">
-                      <Button variant="glass">Sign in</Button>
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {(user && recommendations.length > 0
-                ? recommendations.map((recommendation) => recommendation.entry)
-                : recent.length > 0
-                  ? recent.map((entry) => entry)
-                  : popular.slice(0, 2)
-              )
-                .slice(0, 4)
-                .map((entry) => (
-                  <FoodCard key={entry.food.id} entry={entry} compact />
-                ))}
-            </div>
-          </div>
-        </GlassCard>
-      </PageContainer>
-
-      {/* ------------------------------------------------------ how it works */}
-      <PageContainer id="how-it-works" className="scroll-mt-28">
-        <div className="mx-auto mb-8 max-w-xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]">
-            <Bike className="size-3.5" aria-hidden /> Why order here
-          </span>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Fresh food in four simple steps
-          </h2>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {HOW_IT_WORKS.map((step) => (
-            <GlassCard
-              key={step.title}
-              intensity="card"
-              className="group rounded-3xl p-6 text-center transition-transform duration-300 hover:-translate-y-1"
-            >
-              <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform duration-300 group-hover:scale-105">
-                <step.icon className="size-7" aria-hidden />
-              </span>
-              <h3 className="mt-5 text-lg font-extrabold">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
-            </GlassCard>
-          ))}
-        </div>
-      </PageContainer>
-
-      {/* ---------------------------------------------------------- about us */}
-      <PageContainer className="py-12">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+      {/* -------------------------------------------------------------- about */}
+      <PageContainer className="py-12 lg:py-20">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+          <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
             <span
-              className="blob blob-card absolute -left-4 top-8 h-[70%] w-[74%] bg-primary"
               aria-hidden
+              className="blob blob-hero absolute -left-3 top-6 h-[86%] w-[76%] bg-primary/90"
             />
-            {hero ? (
-              <img
-                src={hero.food.image}
-                alt=""
-                loading="lazy"
-                className="relative z-10 aspect-[5/4] w-full rounded-[2.5rem] border-4 border-white/70 object-cover shadow-2xl shadow-primary-deep/20"
-              />
-            ) : null}
-            <GlassCard
-              intensity="cardStrong"
-              className="animate-float absolute -bottom-6 right-2 z-20 flex items-center gap-3 rounded-3xl px-4 py-3"
-            >
-              <Truck className="size-5 text-primary" aria-hidden />
-              <span className="text-sm font-extrabold">
-                {kitchenCount} kitchens live, {dishCount} dishes
-              </span>
-            </GlassCard>
+            <img
+              src={shot(4)}
+              alt=""
+              loading="lazy"
+              className="relative z-10 ml-auto aspect-[4/3] w-[86%] rounded-[2rem] border-4 border-white/85 object-cover shadow-2xl shadow-primary-deep/20"
+            />
+            <img
+              src={shot(5)}
+              alt=""
+              loading="lazy"
+              className="absolute -bottom-4 left-0 z-20 aspect-square w-[42%] rounded-[1.5rem] border-4 border-white/85 object-cover shadow-xl shadow-primary-deep/20"
+            />
           </div>
 
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]">
-              <ChefHat className="size-3.5" aria-hidden /> About us
-            </span>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-              A marketplace of independent kitchens
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Food Delivery System connects you with local food businesses. Every kitchen sets its own
-              menu, its own proteins and extras, its own delivery fee and radius, and its own hours. The
-              platform keeps the rules identical for everyone: one fee model, one order status model, one
-              review standard.
+            <SectionTitle lead="About" highlight="us" align="start" />
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              {settings.siteName} is a marketplace of independent kitchens, and every kitchen cooks
+              its own menu. You choose what you want to eat first; we show you who is cooking it and
+              when it will reach you. Local dishes, fast food and everything between, ordered in a
+              few taps.
             </p>
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-              {[
-                { icon: Leaf, title: "Dietary filters", body: "Vegetarian, halal, gluten free and more." },
-                { icon: MapPin, title: "Delivery zones", body: "Each kitchen sets its own radius and fee." },
-                { icon: ShoppingBag, title: "One cart", body: "Order from several kitchens in one checkout." },
-                { icon: Clock, title: "Honest timing", body: "Preparation time is published by the kitchen." },
-              ].map((item) => (
-                <li key={item.title} className="flex items-start gap-3 rounded-2xl bg-white/50 p-3.5 backdrop-blur-xl">
-                  <item.icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
-                  <span>
-                    <span className="block text-sm font-bold">{item.title}</span>
-                    <span className="mt-0.5 block text-xs text-muted-foreground">{item.body}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-6 flex">
+              <Link to="/about">
+                <Button
+                  variant="outline"
+                  className="rounded-full border-primary px-6 text-primary-ink hover:bg-primary/15"
+                >
+                  See more
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </PageContainer>
 
-      {/* ------------------------------------------------------- customers */}
-      <PageContainer>
-        <div className="mx-auto mb-8 max-w-xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-primary/20 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em]">
-            <Quote className="size-3.5" aria-hidden /> Customers say
-          </span>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Verified reviews, photos included
-          </h2>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Only reviews attached to a delivered order carry the verified badge.
-          </p>
-        </div>
+      {/* ----------------------------------------------------- popular foods */}
+      <section className="pb-12 lg:pb-20">
+        <PageContainer>
+          <SectionTitle lead="Most" highlight="popular food" />
 
-        {verifiedReviews.length > 0 ? (
-          <div className="grid gap-4 lg:grid-cols-3">
-            {verifiedReviews.map((review) => (
-              <GlassCard key={review.id} intensity="card" className="flex flex-col rounded-3xl p-5">
-                <div className="flex items-center gap-3">
-                  <Avatar name={review.userName} className="size-11" />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold">{review.userName}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {db.foods.find((food) => food.id === review.foodId)?.name ?? "Dish"}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <span className="flex gap-0.5" aria-hidden>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={
-                          star <= review.rating
-                            ? "size-4 fill-primary text-primary"
-                            : "size-4 text-muted-foreground/30"
-                        }
+          {shelf.length > 0 ? (
+            <>
+              <div className="mt-10 grid grid-cols-3 items-center gap-2 sm:gap-5 lg:gap-7">
+                {shelf.map((group, index) => (
+                  <Link
+                    key={group.cuisine.id}
+                    to={`/foods?cuisine=${group.cuisine.id}`}
+                    className={cn(
+                      "group flex flex-col overflow-hidden rounded-2xl bg-card p-2 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-3",
+                      // The middle card is the one the reference design lifts.
+                      index === 1 && "z-10 shadow-xl sm:-translate-y-5 sm:scale-[1.04]",
+                    )}
+                  >
+                    <span className="relative block overflow-hidden rounded-xl">
+                      <img
+                        src={group.lead ? group.lead.food.image : shot(index + 1)}
+                        alt=""
+                        loading="lazy"
+                        className="img-cover aspect-[4/3] transition-transform duration-500 group-hover:scale-105"
                       />
-                    ))}
-                  </span>
-                  <Badge tone="success">
-                    <BadgeCheck className="size-3" aria-hidden /> Verified
-                  </Badge>
+                    </span>
+                    <span className="mt-2 truncate text-[11px] font-extrabold sm:text-sm">
+                      {group.cuisine.name}
+                    </span>
+                    <span className="mt-1 flex justify-center">
+                      <Stars
+                        showValue={false}
+                        value={group.lead?.rating ?? 0}
+                        count={group.lead?.ratingCount ?? 0}
+                      />
+                    </span>
+                    <span className="mx-auto mt-2 inline-block rounded-full bg-primary px-2.5 py-1 text-[10px] font-extrabold text-primary-foreground transition-colors group-hover:bg-primary-deep group-hover:text-white sm:px-3 sm:text-[11px]">
+                      See menu
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
+              {pageCount > 1 ? (
+                <div className="mt-6 flex justify-center gap-2 lg:mt-10">
+                  {Array.from({ length: pageCount }).map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setPage(index)}
+                      aria-label={`Show cuisines ${index * PAGE_SIZE + 1} to ${Math.min(
+                        (index + 1) * PAGE_SIZE,
+                        cuisines.length,
+                      )}`}
+                      aria-current={index === page}
+                      className={cn(
+                        "size-2.5 rounded-full transition-all",
+                        index === page ? "w-6 bg-primary" : "bg-foreground/20 hover:bg-foreground/40",
+                      )}
+                    />
+                  ))}
                 </div>
-                <p className="mt-4 flex-1 text-sm leading-relaxed">{review.comment}</p>
-                {review.photos.length > 0 ? (
-                  <img
-                    src={review.photos[0]}
-                    alt="Photo attached to a customer review"
-                    loading="lazy"
-                    className="mt-4 h-40 w-full rounded-2xl object-cover"
-                  />
-                ) : null}
-                <p className="mt-4 flex items-center gap-1.5 border-t border-white/50 pt-3 text-xs text-muted-foreground">
-                  <Store className="size-3.5" aria-hidden />
-                  {db.vendors.find((vendor) => vendor.id === review.vendorId)?.name}
-                </p>
-              </GlassCard>
+              ) : null}
+            </>
+          ) : (
+            <p className="mt-8 text-center text-sm text-muted-foreground">
+              No kitchens have published dishes yet. Approved kitchens appear here as soon as they
+              go live.
+            </p>
+          )}
+        </PageContainer>
+      </section>
+
+      {/* ------------------------------------------------------ why choose us */}
+      <section className="pb-12 lg:pb-20">
+        <PageContainer>
+          <SectionTitle id="how-it-works" lead="Why choose our" highlight="food" />
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-3 sm:gap-6">
+            {PROMISES.map((promise, index) => (
+              <div
+                key={promise.title}
+                className={cn(
+                  "rounded-3xl px-4 py-6 text-center transition-transform duration-300",
+                  index === 1
+                    ? "bg-white/80 shadow-xl shadow-primary-deep/10 backdrop-blur-xl sm:-translate-y-4"
+                    : "bg-transparent",
+                )}
+              >
+                <span className="mx-auto flex size-12 items-center justify-center rounded-full border-2 border-primary text-primary-ink sm:size-14">
+                  <promise.icon className="size-5 sm:size-6" aria-hidden />
+                </span>
+                <h3 className="mt-4 text-sm font-extrabold sm:text-lg">{promise.title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{promise.body}</p>
+              </div>
             ))}
           </div>
-        ) : (
-          <EmptyState
-            title="No verified reviews yet"
-            message="Once orders are delivered, verified reviews with photos will appear here."
-          />
-        )}
+        </PageContainer>
+      </section>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          <RatingSummaryPanel summary={overallSummary} />
-          <GlassCard intensity="card" className="rounded-3xl p-5 lg:col-span-2">
-            <h3 className="flex items-center gap-2 text-base font-extrabold">
-              <ShieldCheck className="size-5 text-primary" aria-hidden /> How reviews stay honest
-            </h3>
-            <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-3">
-              <li>Only a delivered order can leave a review.</li>
-              <li>One review per dish per order, editable later.</li>
-              <li>Kitchens reply in public, the merchant can hide abuse.</li>
-            </ul>
-          </GlassCard>
-        </div>
-      </PageContainer>
+      {/* --------------------------------------------------------- customers */}
+      <PageContainer className="pb-16 lg:pb-20">
+        <SectionTitle lead="Customers" highlight="say" />
 
-      {/* --------------------------------------------------------- partners */}
-      <PageContainer className="py-12">
-        <div className="overflow-hidden rounded-[2rem] bg-primary-deep text-white/85">
-          <div className="grid gap-8 p-6 lg:grid-cols-2 lg:p-10">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-primary-foreground">
-                <Store className="size-3.5" aria-hidden /> For business owners
-              </span>
-              <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                Sell on Food Delivery System
-              </h2>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70">
-                Register your food business, publish dishes with photos, configure proteins and extras,
-                manage live inventory and seasonal specials, set your own delivery fee and radius, assign
-                your own riders and answer customer feedback. The merchant approves each kitchen before
-                it goes live and monitors orders, platform fees and vendors from one console.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link to="/vendor-signup">
-                  <Button size="lg">
-                    <ChefHat className="size-4" aria-hidden /> Become a vendor
-                  </Button>
-                </Link>
-                <Link to="/partners">
-                  <Button size="lg" variant="glass">
-                    How partnering works
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {[
-                { icon: Store, title: "Live inventory", body: "Sold out dishes leave the marketplace instantly." },
-                { icon: Truck, title: "Your delivery terms", body: "Set your own timeline, fee and radius." },
-                { icon: Bike, title: "Rider management", body: "Add, edit, activate and assign your riders." },
-                { icon: Star, title: "Seasonal specials", body: "Publish promotional pricing with dates." },
-              ].map((item) => (
-                <li key={item.title} className="rounded-3xl border border-white/15 bg-white/5 p-4 backdrop-blur-xl">
-                  <item.icon className="size-5 text-primary" aria-hidden />
-                  <p className="mt-2 text-sm font-bold text-white">{item.title}</p>
-                  <p className="mt-1 text-xs text-white/60">{item.body}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </PageContainer>
-
-      {/* ---------------------------------------------------------- install */}
-      <PageContainer id="install" className="scroll-mt-28 pb-4">
-        <GlassCard intensity="cardStrong" className="rounded-[2rem] p-6 lg:p-8">
-          <div className="grid items-center gap-6 lg:grid-cols-[1.3fr_1fr]">
-            <div>
-              <Badge tone="primary">
-                <Smartphone className="size-3" aria-hidden /> Progressive web app
-              </Badge>
-              <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
-                Install Food Delivery System on your phone
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-                Installing adds a home screen icon, opens full screen without browser chrome and keeps
-                the app shell cached so it loads instantly. There is no app store listing for this
-                project, installation is handled entirely by your browser.
-              </p>
-
-              <div className="mt-5">
-                {installed ? (
-                  <Badge tone="success">
-                    <BadgeCheck className="size-3" aria-hidden /> Already installed on this device
-                  </Badge>
-                ) : canInstall ? (
-                  <Button size="lg" onClick={() => void promptInstall()}>
-                    <Download className="size-4" aria-hidden /> Install the app
-                  </Button>
-                ) : (
-                  <div className="rounded-2xl border border-white/50 bg-white/55 p-4 backdrop-blur-xl">
-                    <p className="text-sm font-bold">
-                      {supported
-                        ? "Use your browser's install option"
-                        : "This browser cannot install web apps"}
-                    </p>
-                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-                      <li>
-                        <strong>Chrome or Edge (desktop):</strong> the install icon in the address bar,
-                        or the menu then "Install Food Delivery System".
-                      </li>
-                      <li>
-                        <strong>Android:</strong> menu then "Add to Home screen".
-                      </li>
-                      <li>
-                        <strong>iPhone or iPad (Safari):</strong> Share then "Add to Home Screen".
-                      </li>
-                    </ul>
-                    <p className="mt-2 text-[11px] text-muted-foreground">
-                      The app works fully in a normal browser even when installation is unavailable.
-                    </p>
+        <div className="mt-10 grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+          <div>
+            {active ? (
+              <GlassCard
+                key={active.id}
+                intensity="card"
+                className="animate-stagger-fade-in rounded-3xl p-5 sm:p-6"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar name={active.userName} className="size-12" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-extrabold">{active.userName}</p>
+                    <Stars className="mt-0.5" value={active.rating} count={0} />
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+                <Quote className="mt-4 size-6 text-primary" aria-hidden />
+                <p className="mt-2 text-sm leading-relaxed sm:text-base">{active.comment}</p>
+                <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {active.isVerifiedPurchase ? "Verified order review" : "Customer review"}
+                </p>
+              </GlassCard>
+            ) : (
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Reviews are written by customers after a delivery is completed, so nothing here is
+                commissioned. The first ones will appear the moment an order is delivered.
+              </p>
+            )}
 
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              {[
-                { label: "Offline app shell", value: "Cached" },
-                { label: "Install prompt", value: "Browser native" },
-                { label: "Full screen", value: "Standalone" },
-                { label: "Home screen icon", value: "192 and 512px" },
-              ].map((item) => (
-                <li
-                  key={item.label}
-                  className="flex items-center justify-between rounded-2xl border border-white/50 bg-white/55 px-4 py-3 backdrop-blur-xl"
-                >
-                  <span className="text-sm font-semibold">{item.label}</span>
-                  <span className="text-xs font-bold text-foreground">{item.value}</span>
-                </li>
-              ))}
-            </ul>
+            {quotes.length > 1 ? (
+              <div className="mt-6 flex items-center gap-4">
+                <div className="flex -space-x-2">
+                  {quotes.slice(0, 3).map((review, index) => (
+                    <button
+                      key={review.id}
+                      type="button"
+                      onClick={() => setQuote(index)}
+                      aria-label={`Read the review from ${review.userName}`}
+                      className={cn(
+                        "rounded-full border-2 border-white/85 transition-transform",
+                        index === quote ? "scale-110" : "opacity-70 hover:opacity-100",
+                      )}
+                    >
+                      <Avatar name={review.userName} className="size-9" />
+                    </button>
+                  ))}
+                  {quotes.length > 3 ? (
+                    <span className="flex size-9 items-center justify-center rounded-full border-2 border-white/85 bg-primary text-xs font-extrabold text-primary-foreground">
+                      <Plus className="size-3" aria-hidden />
+                      {quotes.length - 3}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="glass"
+                    size="sm"
+                    aria-label="Previous review"
+                    onClick={() => setQuote((current) => (current - 1 + quotes.length) % quotes.length)}
+                  >
+                    <ChevronLeft className="size-4" aria-hidden />
+                  </Button>
+                  <Button
+                    variant="glass"
+                    size="sm"
+                    aria-label="Next review"
+                    onClick={() => setQuote((current) => (current + 1) % quotes.length)}
+                  >
+                    <ChevronRight className="size-4" aria-hidden />
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </div>
-        </GlassCard>
+
+          <div className="relative mx-auto w-full max-w-sm lg:max-w-none">
+            <span
+              aria-hidden
+              className="blob blob-card absolute -right-2 top-4 h-[88%] w-[74%] bg-primary/90"
+            />
+            <img
+              src={shot(6)}
+              alt=""
+              loading="lazy"
+              className="relative z-10 aspect-[4/3] w-[88%] rounded-[2rem] border-4 border-white/85 object-cover shadow-2xl shadow-primary-deep/20"
+            />
+            <img
+              src={shot(7)}
+              alt=""
+              loading="lazy"
+              className="absolute -bottom-5 right-0 z-20 aspect-square w-[40%] rounded-full border-4 border-white/85 object-cover shadow-xl shadow-primary-deep/20"
+            />
+          </div>
+        </div>
       </PageContainer>
+
     </div>
   );
 }
