@@ -301,7 +301,7 @@ export function LocationControl({ className }: { className?: string }) {
 /* ----------------------------------------------------------------- header */
 
 const PUBLIC_LINKS: Array<{ to: string; label: string; end?: boolean }> = [
-  { to: "/", label: "Home", end: true },
+  // No "Home" entry: the logo is the home link, so a second one is redundant.
   { to: "/foods", label: "Browse food" },
   { to: "/partners", label: "Partners" },
   { to: "/#how-it-works", label: "How it works" },
@@ -310,12 +310,15 @@ const PUBLIC_LINKS: Array<{ to: string; label: string; end?: boolean }> = [
 
 /**
  * Desktop header routes. `/foods` and `/partners` are dropped here because the
- * mega-menu already renders both as its two triggers, and repeating one of them
- * as a plain link beside it would read as a duplicate destination.
+ * mega-menu already renders both as its triggers, and repeating one of them as
+ * a plain link beside it would read as a duplicate destination.
  */
 const DESKTOP_LINKS = PUBLIC_LINKS.filter(
   (link) => link.to !== "/foods" && link.to !== "/partners",
 );
+
+/** On a wide screen the mega-menu leads, since it covers the two dropped links. */
+const MEGA_MENU_INDEX = 0;
 
 /**
  * The public header.
@@ -358,18 +361,25 @@ export function PublicHeader() {
   return (
     <header className="sticky top-0 z-40 w-full" ref={menuRootRef}>
       <GlassCard intensity="cardStrong" className="flex w-full flex-col rounded-none border-x-0 border-t-0 py-3">
-        <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 sm:px-6 xl:grid xl:grid-cols-[1fr_auto_1fr] xl:items-center">
           <Link to="/" aria-label="Chupnow home" className="shrink-0">
             <Logo showText={false} className="sm:hidden" />
             <Logo className="hidden sm:flex" />
           </Link>
 
-          {/* Every destination sits on the logo's line, never underneath it. The
-              mega-menu takes the slot directly after Home. */}
-          <nav aria-label="Primary" className="hidden flex-1 items-center gap-0.5 xl:flex">
+          {/*
+            Centred between the logo and the actions rather than left-aligned.
+            A three-column grid does this properly: the middle column hugs its
+            content and sits mid-page whatever the logo and buttons measure,
+            which `flex-1` plus a margin cannot guarantee.
+          */}
+          <nav
+            aria-label="Primary"
+            className="hidden items-center gap-0.5 xl:flex xl:justify-center"
+          >
             {DESKTOP_LINKS.map((link, index) => (
               <Fragment key={link.to}>
-                {index === 1 ? <HeaderBrowseMenu /> : null}
+                {index === MEGA_MENU_INDEX ? <HeaderBrowseMenu /> : null}
                 <NavLink to={link.to} end={link.end} className={navLinkClass(link.to)}>
                   {link.label}
                 </NavLink>
@@ -377,7 +387,7 @@ export function PublicHeader() {
             ))}
           </nav>
 
-          <div className="ml-auto flex shrink-0 items-center gap-2 xl:ml-0">
+          <div className="ml-auto flex shrink-0 items-center gap-2 xl:ml-0 xl:justify-end">
             {/* One call to action for a visitor, and it creates the account. */}
             <Link to="/sign-up">
               <Button size="sm">
@@ -411,15 +421,16 @@ export function PublicHeader() {
       {menuOpen ? (
         <nav
           aria-label="Mobile"
-          className="absolute inset-x-0 top-full z-20 mx-auto w-full max-w-7xl px-4 pb-3 sm:px-6 xl:hidden"
+          className="absolute inset-x-0 top-full z-20 mx-auto w-full pb-3 xl:hidden"
         >
-          <div className="grid gap-1 rounded-2xl border border-white/40 bg-white/55 p-2 text-foreground shadow-2xl shadow-black/20 backdrop-blur-2xl dark:border-white/20 dark:bg-black/50">
+          {/* Half the page wide, links centred inside it. */}
+          <div className="mx-auto grid w-1/2 gap-1 rounded-2xl border border-white/40 bg-white/55 p-2 text-center text-foreground shadow-2xl shadow-black/20 backdrop-blur-2xl dark:border-white/20 dark:bg-black/50">
             {PUBLIC_LINKS.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 onClick={() => setMenuOpen(false)}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-white/60"
+                className="flex w-full items-center justify-center rounded-xl px-2 py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-white/60"
               >
                 {link.label}
               </Link>
