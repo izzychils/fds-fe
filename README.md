@@ -1,4 +1,4 @@
-# Food Delivery System
+# Chupnow
 
 A modern food delivery marketplace connecting customers with independent kitchens.
 

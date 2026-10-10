@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 /**
  * Public banner carousel.
  *
- * Content comes entirely from the banner records the merchant edits — nothing
+ * Content comes entirely from the banner records the merchant edits, nothing
  * is hardcoded here. Supports autoplay (pausable), keyboard navigation, touch
  * swiping, and an empty state when every banner is deactivated.
  */

@@ -29,7 +29,7 @@ createRoot(container).render(
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     void navigator.serviceWorker.register("/sw.js").catch((error) => {
-      console.warn("[Food Delivery System] Service worker registration failed:", error);
+      console.warn("[Chupnow] Service worker registration failed:", error);
     });
   });
 }

@@ -16,7 +16,7 @@ import {
   useDisclosure,
 } from "@/components/ui";
 import { OrderCard, StatusActions, StatusTimeline, TrackingPanel } from "@/components/orders";
-import { PageContainer } from "@/components/layout/public";
+import { DashboardContainer } from "@/components/layout/dashboard";
 import { ReviewForm } from "@/components/reviews";
 import { useAsyncAction, useDb, useSession, useTrackingTicker, useDbMemo } from "@/hooks";
 import { orderService, reviewService, settingsService, trackingService } from "@/services";
@@ -43,7 +43,7 @@ export function CustomerOrdersPage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to see your orders"
           action={
@@ -52,7 +52,7 @@ export function CustomerOrdersPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
@@ -63,7 +63,7 @@ export function CustomerOrdersPage() {
     });
 
   return (
-    <PageContainer className="space-y-6">
+    <DashboardContainer className="space-y-6">
       <SectionHeading
         title="Your orders"
         subtitle="Every order keeps its full status history, including how it was prepared and delivered."
@@ -130,7 +130,7 @@ export function CustomerOrdersPage() {
           );
         })}
       </Tabs>
-    </PageContainer>
+    </DashboardContainer>
   );
 }
 
@@ -172,7 +172,7 @@ export function CustomerOrderDetailPage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to view this order"
           action={
@@ -181,13 +181,13 @@ export function CustomerOrderDetailPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   if (!order) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           icon={<Receipt className="size-5" aria-hidden />}
           title="Order not found"
@@ -198,13 +198,13 @@ export function CustomerOrderDetailPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   if (order.customerId !== user.id && user.role === "customer") {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="That isn't your order"
           message="You can only view orders placed on your own account."
@@ -214,12 +214,12 @@ export function CustomerOrderDetailPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   return (
-    <PageContainer className="space-y-6">
+    <DashboardContainer className="space-y-6">
       <Button variant="ghost" size="sm" onClick={() => navigate("/app/orders")}>
         <ArrowLeft className="size-4" aria-hidden /> All orders
       </Button>
@@ -505,6 +505,6 @@ export function CustomerOrderDetailPage() {
           }}
         />
       ) : null}
-    </PageContainer>
+    </DashboardContainer>
   );
 }

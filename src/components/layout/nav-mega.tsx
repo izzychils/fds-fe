@@ -184,7 +184,7 @@ export function HeaderBrowseMenu() {
             >
               <PanelLink
                 to="/vendor-signup"
-                title="Sell on Food Delivery System"
+                title="Sell on Chupnow"
                 description="Register your kitchen, publish a menu and take orders."
                 icon={<Store className="size-4" aria-hidden />}
               />

@@ -83,71 +83,25 @@ export default function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
 
-          {/* ------------------------------------------------- customer */}
-          <Route
-            path="/app"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CustomerHomePage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/cart"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CartPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/checkout"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CheckoutPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/orders"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CustomerOrdersPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/orders/:orderId"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CustomerOrderDetailPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/favorites"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <FavoritesPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/reviews"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CustomerReviewsPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/profile"
-            element={
-              <RequireAuth roles={["customer"]}>
-                <CustomerProfilePage />
-              </RequireAuth>
-            }
-          />
+        </Route>
+
+        {/* customer console: on the console shell, outside PublicLayout */}
+        <Route
+          path="/app"
+          element={
+            <RequireAuth roles={["customer"]}>
+              <DashboardLayout role="customer" />
+            </RequireAuth>
+          }
+        >
+          <Route index element={<CustomerHomePage />} />
+          <Route path="cart" element={<CartPage />} />
+          <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="orders" element={<CustomerOrdersPage />} />
+          <Route path="orders/:orderId" element={<CustomerOrderDetailPage />} />
+          <Route path="favorites" element={<FavoritesPage />} />
+          <Route path="reviews" element={<CustomerReviewsPage />} />
+          <Route path="profile" element={<CustomerProfilePage />} />
         </Route>
 
         {/* -------------------------------------------------------- auth */}

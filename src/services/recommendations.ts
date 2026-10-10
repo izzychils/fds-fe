@@ -4,13 +4,13 @@ import { foodService, isSoldOut } from "@/services/catalog";
 import { distanceKm } from "@/lib/utils";
 
 /**
- * RECOMMENDATION ENGINE — RULE BASED
+ * RECOMMENDATION ENGINE, RULE BASED
  * ==================================
  * This is deliberately NOT advertised as machine learning. It is an explicit,
  * inspectable scoring function over signals we already hold on the client, and
  * every suggestion carries a human-readable reason so the customer can see why
  * it appeared. A real recommendation service can replace `rank()` later without
- * touching a single component — the shape of the result stays the same.
+ * touching a single component, the shape of the result stays the same.
  *
  * Backend contract:
  *   GET /recommendations?userId=…&addressId=…

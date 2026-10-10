@@ -307,7 +307,7 @@ export function OrderTotals({ order, feeBasis }: { order: Order; feeBasis?: stri
  *
  * When a tile provider is configured (default: OpenStreetMap's keyless embed)
  * a REAL map is rendered inside the panel. The courier's position, however, is
- * produced by the development simulator — so the panel always labels it as
+ * produced by the development simulator, so the panel always labels it as
  * simulated and never presents it as live GPS. If the map cannot load, the
  * fallback progress strip still communicates the delivery stage.
  */
@@ -474,7 +474,7 @@ function Detail({
 /**
  * Advance/stop controls. The buttons offered are derived from the SAME
  * transition table the service validates against, so the UI can never offer an
- * illegal jump — and the service rejects one anyway if it is called directly.
+ * illegal jump, and the service rejects one anyway if it is called directly.
  */
 export function StatusActions({
   order,

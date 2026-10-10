@@ -5,7 +5,7 @@ import { summariseReviews, type RatingSummary } from "@/services/catalog";
 import { uid } from "@/lib/utils";
 
 /**
- * Content services — banners, platform settings, reviews and the audit trail.
+ * Content services, banners, platform settings, reviews and the audit trail.
  *
  * Backend contract mirrored by every function:
  *   banners   GET|POST|PATCH|DELETE /banners
@@ -122,7 +122,7 @@ export const settingsService = {
     return getDb().settings;
   },
 
-  /** Vendor-scoped defaults are never stored here — this is platform config. */
+  /** Vendor-scoped defaults are never stored here, this is platform config. */
   update(patch: Partial<PlatformSettings>, actor: User): PlatformSettings {
     assertAdmin(actor, "platform settings");
     validateSettings(patch);

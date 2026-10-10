@@ -7,8 +7,7 @@ import { cartService } from "@/services/cart";
 
 /**
  * The reactive store hook. Every component that reads data subscribes here, so
- * ANY change anywhere in the application re-renders the affected screens —
- * which is why a dish added on the vendor dashboard appears on the marketplace
+ * ANY change anywhere in the application re-renders the affected screens,  * which is why a dish added on the vendor dashboard appears on the marketplace
  * immediately, and why opening the customer and admin views in two tabs keeps
  * them in step (same-origin `storage` events).
  */
@@ -21,8 +20,8 @@ export function useDb(): Database {
  *
  * The service layer already reads the current snapshot from the repository, so
  * a selector body rarely mentions `db` itself. Passing the snapshot in anyway
- * keeps the derived value correct — it is recomputed whenever ANY part of the
- * store changes, exactly like `useMemo(..., [db])` — while making the
+ * keeps the derived value correct, it is recomputed whenever ANY part of the
+ * store changes, exactly like `useMemo(..., [db])`, while making the
  * dependency real rather than merely declared.
  *
  * `deps` carries the caller's own inputs (a route param, a filter, the session

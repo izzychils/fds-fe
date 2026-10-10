@@ -116,7 +116,7 @@ export function Card({
 
 /**
  * The glassmorphism surface. The class strings come from the EXACT module
- * ported out of `frontend_v0/src/lib/glass-morphism.ts` — no re-invented blur
+ * ported out of `frontend_v0/src/lib/glass-morphism.ts`, no re-invented blur
  * values anywhere in this codebase.
  */
 export function GlassCard({
@@ -256,7 +256,7 @@ export function Field({
 }
 
 /**
- * Shared control chrome. Focus is communicated by the BORDER COLOUR alone — the
+ * Shared control chrome. Focus is communicated by the BORDER COLOUR alone, the
  * 2px border moves from a soft neutral to brand green, and the browser outline
  * is removed. `:focus` (not `:focus-visible`) is deliberate here: it keeps the
  * affordance identical whether the field was reached by mouse or keyboard.

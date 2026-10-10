@@ -13,7 +13,7 @@ import { uid } from "@/lib/utils";
  *         POST /cart/validate                   (re-price & re-check stock)
  *
  * The cart lives in the development repository so it survives navigation and a
- * page reload — never in component state.
+ * page reload, never in component state.
  */
 
 export interface AddToCartInput {

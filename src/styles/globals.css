@@ -152,7 +152,7 @@
   /*
    * Display type. Outfit's optical sizing flattens at body sizes, so headings
    * get a tighter tracking and a heavier default weight than the rest of the
-   * interface — the reference design leans on very bold, tightly set headlines.
+   * interface, the reference design leans on very bold, tightly set headlines.
    */
   h1,
   h2,
@@ -185,11 +185,17 @@
   position: fixed;
   inset: 0;
   z-index: -2;
+  /*
+   * Deeper than a flat off-white on purpose: translucent panels only read as
+   * glass when there is something coloured behind them, so the warm brand
+   * washes are kept strong enough to show through the frosted surfaces.
+   */
   background:
-    radial-gradient(56rem 32rem at 10% -10%, hsl(var(--primary) / 0.3), transparent 62%),
-    radial-gradient(42rem 28rem at 94% 2%, hsl(var(--brand-amber) / 0.2), transparent 62%),
-    radial-gradient(58rem 38rem at 50% 110%, hsl(var(--primary) / 0.16), transparent 66%),
-    linear-gradient(180deg, hsl(var(--background)), hsl(40 36% 96%));
+    radial-gradient(58rem 34rem at 8% -12%, hsl(var(--primary) / 0.5), transparent 60%),
+    radial-gradient(46rem 30rem at 96% -4%, hsl(var(--brand-amber) / 0.42), transparent 60%),
+    radial-gradient(40rem 26rem at 118% 62%, hsl(var(--brand-amber) / 0.28), transparent 62%),
+    radial-gradient(64rem 40rem at 44% 112%, hsl(var(--primary) / 0.34), transparent 64%),
+    linear-gradient(155deg, hsl(40 48% 94%), hsl(38 42% 92%) 45%, hsl(42 44% 95%));
 }
 
 .app-ambient::after {
@@ -205,9 +211,10 @@
 
 .dark .app-ambient::before {
   background:
-    radial-gradient(56rem 32rem at 10% -10%, hsl(var(--primary) / 0.22), transparent 62%),
-    radial-gradient(42rem 28rem at 94% 2%, hsl(var(--brand-amber) / 0.12), transparent 62%),
-    linear-gradient(180deg, hsl(var(--background)), hsl(0 0% 8%));
+    radial-gradient(58rem 34rem at 8% -12%, hsl(var(--primary) / 0.3), transparent 60%),
+    radial-gradient(46rem 30rem at 96% -4%, hsl(var(--brand-amber) / 0.2), transparent 60%),
+    radial-gradient(52rem 34rem at 50% 112%, hsl(var(--primary) / 0.22), transparent 64%),
+    linear-gradient(160deg, hsl(0 0% 9%), hsl(0 0% 6%));
 }
 
 /* ---------------------------------------------------------------------------

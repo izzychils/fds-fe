@@ -2,7 +2,7 @@ import type { OrderStatus } from "@/types";
 
 /**
  * Filter option keys for the order boards. Kept in one place so the vendor and
- * merchant consoles offer exactly the same statuses — derived from the shared
+ * merchant consoles offer exactly the same statuses, derived from the shared
  * order status model rather than hand-written per screen.
  */
 export type OrderFilterKey = OrderStatus | "all" | "live";

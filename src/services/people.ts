@@ -5,7 +5,7 @@ import { ServiceError } from "@/services/catalog";
 import { uid } from "@/lib/utils";
 
 /**
- * People services — development authentication, profiles, addresses, favourites.
+ * People services, development authentication, profiles, addresses, favourites.
  *
  * Backend contract mirrored by every function:
  *   auth       POST /auth/sign-in | /auth/sign-up | /auth/sign-out
@@ -14,7 +14,7 @@ import { uid } from "@/lib/utils";
  *   addresses  GET|POST|PATCH|DELETE /users/:id/addresses
  *   favorites  GET|POST|DELETE /users/:id/favorites
  *
- * ⚠️  DEVELOPMENT AUTHENTICATION — NOT PRODUCTION SECURITY
+ * ⚠️  DEVELOPMENT AUTHENTICATION, NOT PRODUCTION SECURITY
  * Credentials are verified against a local record and the session is just a
  * user id in localStorage. There is no hashing, no token, no expiry and no
  * server-side enforcement. This exists so the product can be exercised
@@ -159,7 +159,7 @@ export const authService = {
   },
 
   /**
-   * Development password reset. No email is sent — the code is returned so the
+   * Development password reset. No email is sent, the code is returned so the
    * UI can display it in a clearly-marked development panel.
    */
   requestPasswordReset(email: string): { code: string; email: string } {
@@ -234,7 +234,7 @@ export const authService = {
     });
   },
 
-  /** Administrative role change — never exposed as a public sign-up option. */
+  /** Administrative role change, never exposed as a public sign-up option. */
   setRole(userId: string, role: Role, actor: { id: string; fullName: string; role: Role }) {
     if (actor.role !== "admin") throw new ServiceError("Only a merchant admin can change roles.");
     update((draft) => {

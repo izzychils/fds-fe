@@ -176,7 +176,7 @@ export const orderService = {
     return [...getDb().orders].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 
-  /** Customer sees only their own orders — enforced here, and by the backend. */
+  /** Customer sees only their own orders, enforced here, and by the backend. */
   listForCustomer(userId: string): Order[] {
     return orderService.list().filter((o) => o.customerId === userId);
   },
@@ -297,7 +297,7 @@ export const orderService = {
       total: Math.max(0, subtotal + deliveryFee + fee.amount - discount),
       address,
       paymentMethod: input.paymentMethod,
-      // No provider has confirmed anything yet — this is deliberately honest.
+      // No provider has confirmed anything yet, this is deliberately honest.
       paymentStatus: input.paymentMethod === "cash" ? "pending" : "pending",
       paymentReference: null,
       riderId: null,
@@ -598,7 +598,7 @@ function rollUpStatus(order: Order): OrderStatus {
  * There is no fleet telematics provider connected. This module interpolates a
  * plausible route between the kitchen and the delivery address so the tracking
  * UI can be built and reviewed. The interface labels it "simulated" everywhere
- * it appears — it is never presented as live GPS.
+ * it appears, it is never presented as live GPS.
  *
  * When a real provider exists, replace `buildPath`/`advance` with the backend
  * tracking endpoint (`GET /orders/:id/tracking`) and delete this simulator.

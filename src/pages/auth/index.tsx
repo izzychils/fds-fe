@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   KeyRound,
+  ShieldCheck,
   ShoppingBag,
   Store,
 } from "lucide-react";
@@ -44,17 +45,18 @@ function AuthShell({
   return (
     <div className="app-ambient min-h-dvh">
       <div className="mx-auto grid min-h-dvh w-full max-w-7xl gap-0 lg:grid-cols-2 lg:gap-8 lg:p-6">
-        {/* Dark green brand panel, the reference image used for sign-up */}
+        {/* Brand panel: a photograph under an ink glass wash. */}
         <aside className="relative hidden overflow-hidden lg:block lg:rounded-3xl">
           <img src={heroImage} alt="" className="img-cover absolute inset-0" />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary-deep/92 via-primary-deep/80 to-primary-deep/95" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary-deep/85 via-primary-deep/70 to-primary-deep/92" />
+          <div className="absolute inset-0 backdrop-blur-[2px]" aria-hidden />
           <div className="relative flex h-full flex-col justify-between p-8 text-white">
-            <Link to="/" aria-label="Back to Food Delivery System">
+            <Link to="/" aria-label="Back to Chupnow">
               <span className="flex items-center gap-2.5">
                 <span className="flex size-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-xl">
                   <ChefHat className="size-5" aria-hidden />
                 </span>
-                <span className="text-base font-extrabold tracking-tight">Food Delivery System</span>
+                <span className="text-base font-extrabold tracking-tight">Chupnow</span>
               </span>
             </Link>
 
@@ -320,7 +322,7 @@ export function SignUpPage() {
           confirmPassword: form.confirmPassword,
           dietaryPreferences: dietary,
         }),
-      { success: "Account created, welcome to Food Delivery System", silentError: true },
+      { success: "Account created, welcome to Chupnow", silentError: true },
     );
     if (user) navigate("/app", { replace: true });
     else setFormError("We couldn't create that account. Try a different email address.");
@@ -357,45 +359,70 @@ export function SignUpPage() {
                   value: "customer" as const,
                   icon: ShoppingBag,
                   title: "Order food",
-                  body: "A customer account to browse and order.",
+                  body: "A customer account to browse, order and track deliveries.",
                 },
                 {
                   value: "vendor" as const,
                   icon: Store,
                   title: "Sell food",
-                  body: "Register a kitchen and manage its menu.",
+                  body: "A kitchen account with its own menu, riders and orders.",
+                },
+                {
+                  value: "admin" as const,
+                  icon: ShieldCheck,
+                  title: "Admin",
+                  body: "Platform console for vendors, orders and fees.",
                 },
               ]
-            ).map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                aria-pressed={role === option.value}
-                onClick={() => {
-                  if (option.value === "vendor") {
-                    navigate("/vendor-signup");
-                    return;
-                  }
-                  setRole(option.value);
-                }}
-                className={cn(
-                  "flex items-start gap-3 rounded-2xl border p-3 text-left transition-all",
-                  role === option.value
-                    ? "border-primary bg-primary/8 shadow-sm"
-                    : "border-border hover:bg-accent/60",
-                )}
-              >
-                <option.icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
-                <span>
-                  <span className="block text-sm font-bold">{option.title}</span>
-                  <span className="block text-xs text-muted-foreground">{option.body}</span>
-                </span>
-              </button>
-            ))}
+            ).map((option) => {
+              const selected = role === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => {
+                    if (option.value === "vendor") {
+                      navigate("/vendor-signup");
+                      return;
+                    }
+                    if (option.value === "admin") {
+                      navigate("/contact");
+                      return;
+                    }
+                    setRole(option.value);
+                  }}
+                  className={cn(
+                    "flex h-full flex-col items-start gap-2 rounded-2xl border p-4 text-left backdrop-blur-xl transition-all duration-300",
+                    selected
+                      ? "border-primary bg-primary/15 shadow-lg shadow-primary/10"
+                      : "border-white/50 bg-white/40 hover:-translate-y-0.5 hover:bg-white/60",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex size-10 items-center justify-center rounded-xl",
+                      selected ? "bg-primary text-primary-foreground" : "bg-white/70 text-primary-ink",
+                    )}
+                  >
+                    <option.icon className="size-5" aria-hidden />
+                  </span>
+                  <span className="text-sm font-bold">{option.title}</span>
+                  <span className="text-xs leading-relaxed text-muted-foreground">
+                    {option.body}
+                  </span>
+                  {option.value === "admin" ? (
+                    <span className="mt-1 rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                      Invitation only
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Administrator access cannot be self-assigned. Merchant roles are granted by an existing
-            platform administrator.
+            Administrator access cannot be self-assigned: an existing platform administrator creates
+            that account. Customers and kitchens register here.
           </p>
         </fieldset>
 

@@ -4,7 +4,7 @@ import type { Role, User } from "@/types";
  * Authorization helpers shared by every service.
  *
  * These guards are DEFENCE-IN-DEPTH for the UI, not the security boundary.
- * Hiding a button proves nothing — the backend must independently authenticate
+ * Hiding a button proves nothing, the backend must independently authenticate
  * the caller and check ownership on every request (§34 of the brief).
  */
 

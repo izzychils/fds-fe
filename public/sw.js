@@ -6,12 +6,12 @@
  * --------
  * • Navigations: network-first, falling back to the cached app shell and then
  *   to `/offline.html` when the device is offline.
- * • Vite's hashed build output (`/assets/*`): cache-first — those filenames are
+ * • Vite's hashed build output (`/assets/*`): cache-first, those filenames are
  *   content-addressed, so a cached copy is always the right copy.
  * • Same-origin images: stale-while-revalidate.
  * • Anything else (including every API call) is passed straight through and
  *   NEVER cached. Authenticated API responses must not end up in a shared
- *   cache — that is a security requirement, not an optimisation.
+ *   cache, that is a security requirement, not an optimisation.
  *
  * Bump CACHE_VERSION on release; old caches are purged on activate.
  */
@@ -94,7 +94,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Food photography and icons — show what we have, refresh in the background.
+  // Food photography and icons, show what we have, refresh in the background.
   if (request.destination === "image") {
     event.respondWith(
       caches.match(request).then((cached) => {

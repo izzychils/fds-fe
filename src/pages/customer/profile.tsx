@@ -34,7 +34,7 @@ import {
 } from "@/components/ui";
 import { UserProfileSidebar } from "@/components/ui/menu";
 import { FoodCard } from "@/components/food";
-import { PageContainer } from "@/components/layout/public";
+import { DashboardContainer } from "@/components/layout/dashboard";
 import { ReviewForm, ReviewItem } from "@/components/reviews";
 import { useAsyncAction, useDb, useSession, useDbMemo } from "@/hooks";
 import {
@@ -111,7 +111,7 @@ export function CustomerProfilePage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to view your profile"
           action={
@@ -120,7 +120,7 @@ export function CustomerProfilePage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
@@ -234,7 +234,7 @@ export function CustomerProfilePage() {
   };
 
   return (
-    <PageContainer className="space-y-6">
+    <DashboardContainer className="space-y-6">
       <SectionHeading
         title="Your profile"
         subtitle="Everything here is editable and reflected across the app immediately."
@@ -716,7 +716,7 @@ export function CustomerProfilePage() {
         confirmLabel="Delete address"
         pending={pending}
       />
-    </PageContainer>
+    </DashboardContainer>
   );
 }
 
@@ -805,7 +805,7 @@ export function FavoritesPage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to see your saved dishes"
           action={
@@ -814,12 +814,12 @@ export function FavoritesPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   return (
-    <PageContainer className="space-y-6">
+    <DashboardContainer className="space-y-6">
       <SectionHeading
         title="Saved dishes"
         subtitle="Your favourites also feed the recommendation engine."
@@ -847,7 +847,7 @@ export function FavoritesPage() {
           ))}
         </div>
       )}
-    </PageContainer>
+    </DashboardContainer>
   );
 }
 
@@ -868,7 +868,7 @@ export function CustomerReviewsPage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to manage your reviews"
           action={
@@ -877,12 +877,12 @@ export function CustomerReviewsPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   return (
-    <PageContainer className="space-y-8">
+    <DashboardContainer className="space-y-8">
       <SectionHeading
         title="Your reviews"
         subtitle="Reviews are tied to delivered orders. Verified badges appear only on genuine purchases."
@@ -987,6 +987,6 @@ export function CustomerReviewsPage() {
         confirmLabel="Delete review"
         pending={pending}
       />
-    </PageContainer>
+    </DashboardContainer>
   );
 }

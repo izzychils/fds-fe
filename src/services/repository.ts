@@ -11,7 +11,7 @@ import { uid } from "@/lib/utils";
  * stable between mutations (required by `useSyncExternalStore`).
  *
  * Cross-tab synchronisation is REAL for same-origin tabs in the same browser
- * via the `storage` event — open the customer and the admin dashboard side by
+ * via the `storage` event, open the customer and the admin dashboard side by
  * side and status changes propagate. It is NOT cross-device or multi-user
  * real-time: that must come from the backend (WebSocket/SSE/polling). See
  * `src/services/tracking.ts` for the honest wording used in the UI.
@@ -27,6 +27,41 @@ const listeners = new Set<() => void>();
 
 function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
+/**
+ * Brand migration.
+ *
+ * Platform settings live inside the persisted document, so renaming the brand
+ * in `seed.ts` would never reach a browser that already stored a database. This
+ * rewrites the branding fields, and only when they still hold the previous
+ * values, so a visitor's cart, orders and profile are left untouched.
+ */
+function applyBrandMigration(db: Database): { next: Database; changed: boolean } {
+  // Literals rather than module constants on purpose: this runs from the
+  // module initialiser, before any later `const` in this file is initialised.
+  const current = db.settings;
+  if (!current) return { next: db, changed: false };
+  const staleName = current.siteName === "Food Delivery System";
+  const staleLogoText = current.logoText === "Food Delivery System";
+  const staleEmail = current.contactEmail === "support@nmaskitchen.ng";
+  const missingLogo = !current.logoUrl;
+  if (!staleName && !staleLogoText && !staleEmail && !missingLogo) {
+    return { next: db, changed: false };
+  }
+  return {
+    changed: true,
+    next: {
+      ...db,
+      settings: {
+        ...current,
+        siteName: staleName ? "Chupnow" : current.siteName,
+        logoText: staleLogoText ? "Chupnow" : current.logoText,
+        logoUrl: current.logoUrl ?? "/logo.png",
+        contactEmail: staleEmail ? "support@chupnow.ng" : current.contactEmail,
+      },
+    },
+  };
 }
 
 function loadInitial(): Database {
@@ -45,7 +80,10 @@ function loadInitial(): Database {
       return seeded;
     }
     // Defensive: a document persisted by an older build may miss new keys.
-    return { ...createSeedDatabase(), ...parsed };
+    const merged = { ...createSeedDatabase(), ...parsed };
+    const migrated = applyBrandMigration(merged);
+    if (migrated.changed) persist(migrated.next);
+    return migrated.next;
   } catch {
     return createSeedDatabase();
   }
@@ -57,7 +95,7 @@ function persist(next: Database) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch (error) {
     // Quota errors are realistic once review photos are stored as data-URLs.
-    console.error("[Food Delivery System] Could not persist the development database.", error);
+    console.error("[Chupnow] Could not persist the development database.", error);
   }
 }
 
@@ -88,7 +126,7 @@ export function update(mutator: (draft: Database) => void): Database {
   return db;
 }
 
-/** Re-reads from storage — used by the cross-tab `storage` listener. */
+/** Re-reads from storage, used by the cross-tab `storage` listener. */
 export function reloadFromStorage() {
   db = loadInitial();
   emit();
@@ -117,7 +155,7 @@ export function exportDatabase(): string {
 export function importDatabase(json: string): Database {
   const parsed = JSON.parse(json) as Database;
   if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.foods)) {
-    throw new Error("That file is not a valid Food Delivery System data export.");
+    throw new Error("That file is not a valid Chupnow data export.");
   }
   db = { ...createSeedDatabase(), ...parsed };
   persist(db);

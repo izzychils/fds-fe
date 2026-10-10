@@ -14,7 +14,8 @@ import {
 import { CategoryChips, FoodCard } from "@/components/food";
 import { BannerCarousel } from "@/components/banners";
 import { StatusProgress } from "@/components/orders";
-import { FoodSearchField, LocationControl, PageContainer } from "@/components/layout/public";
+import { FoodSearchField, LocationControl } from "@/components/layout/public";
+import { DashboardContainer } from "@/components/layout/dashboard";
 import { useDb, useSession, useDbMemo } from "@/hooks";
 import {
   bannerService,
@@ -99,7 +100,7 @@ export default function CustomerHomePage() {
     .reduce((sum, order) => sum + order.total, 0);
 
   return (
-    <PageContainer className="space-y-8">      {/* greeting: identity, address and the categories people pick most often,
+    <DashboardContainer className="space-y-8">      {/* greeting: identity, address and the categories people pick most often,
           grouped into one panel so the top of the dashboard reads as a summary
           rather than a heading floating above a search box. */}
       <GlassCard intensity="cardStrong" className="rounded-[2rem] p-5 sm:p-6">
@@ -386,6 +387,6 @@ export default function CustomerHomePage() {
           </Button>
         </Link>
       </Card>
-    </PageContainer>
+    </DashboardContainer>
   );
 }

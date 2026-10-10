@@ -27,7 +27,7 @@ import {
   Textarea,
   useDisclosure,
 } from "@/components/ui";
-import { PageContainer } from "@/components/layout/public";
+import { DashboardContainer } from "@/components/layout/dashboard";
 import { useAsyncAction, useDb, useSession, useDbMemo } from "@/hooks";
 import {
   addressService,
@@ -106,7 +106,7 @@ export function CartPage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to see your cart"
           action={
@@ -115,13 +115,13 @@ export function CartPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   if (items.length === 0) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           icon={<ShoppingBag className="size-5" aria-hidden />}
           title="Your cart is empty"
@@ -132,12 +132,12 @@ export function CartPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   return (
-    <PageContainer className="space-y-6">
+    <DashboardContainer className="space-y-6">
       <SectionHeading
         title="Your cart"
         subtitle={
@@ -358,7 +358,7 @@ export function CartPage() {
         confirmLabel="Empty cart"
         pending={pending}
       />
-    </PageContainer>
+    </DashboardContainer>
   );
 }
 
@@ -451,7 +451,7 @@ export function CheckoutPage() {
 
   if (!user) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Sign in to check out"
           action={
@@ -460,13 +460,13 @@ export function CheckoutPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
   if (items.length === 0) {
     return (
-      <PageContainer>
+      <DashboardContainer>
         <EmptyState
           title="Nothing to check out"
           message="Your cart is empty."
@@ -476,7 +476,7 @@ export function CheckoutPage() {
             </Link>
           }
         />
-      </PageContainer>
+      </DashboardContainer>
     );
   }
 
@@ -511,7 +511,7 @@ export function CheckoutPage() {
       return;
     }
 
-    // Development payment transport — nothing is charged and the status stays
+    // Development payment transport, nothing is charged and the status stays
     // "pending" until a real provider confirms it server-side.
     const intent = await createDevelopmentPaymentIntent({ amount: order.total, orderId: order.id });
     toast.warning("Order placed, payment not yet confirmed", {
@@ -522,7 +522,7 @@ export function CheckoutPage() {
   };
 
   return (
-    <PageContainer className="space-y-6">
+    <DashboardContainer className="space-y-6">
       <SectionHeading
         title="Checkout"
         subtitle="Confirm where it's going and how you'd like to pay."
@@ -705,6 +705,6 @@ export function CheckoutPage() {
           </GlassCard>
         </aside>
       </div>
-    </PageContainer>
+    </DashboardContainer>
   );
 }

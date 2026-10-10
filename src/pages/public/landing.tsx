@@ -22,13 +22,13 @@ import { cn } from "@/lib/utils";
  *
  * This is deliberately a storefront, not a dashboard: it sells the service and
  * hands the reader off to the menu. Nothing that a signed-in account owns
- * belongs here — no prices, no per-dish records, no live account figures — so
+ * belongs here, no prices, no per-dish records, no live account figures, so
  * the page reads as the same brand as `inspo/landing page.jpeg` rather than as
  * a screen of the app. The one rule that shapes every block below: photographs
  * are shown as photographs, and any number that appears is real and explained.
  */
 
-/** The three promises under "Why choose our food" — one line each, as in the reference. */
+/** The three promises under "Why choose our food", one line each, as in the reference. */
 const PROMISES = [
   {
     icon: ChefHat,
@@ -211,12 +211,7 @@ export default function LandingPage() {
         <div className="mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 lg:pt-12">
           <div className="grid items-center gap-4 lg:grid-cols-2 lg:gap-12">
             <div className="reveal-up">
-              <span className="flex items-center gap-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-primary-ink sm:text-xs">
-                <span className="h-px w-6 bg-primary-ink sm:w-9" aria-hidden />
-                {settings.siteName}
-              </span>
-
-              <h1 className="mt-3 text-[1.6rem] font-extrabold leading-[1.06] tracking-tight sm:mt-5 sm:text-4xl lg:text-[3.5rem]">
+              <h1 className="text-[1.6rem] font-extrabold leading-[1.06] tracking-tight sm:text-4xl lg:text-[3.5rem]">
                 We serve delicious{" "}
                 <span className="relative inline-block text-primary-ink">
                   food
@@ -229,7 +224,8 @@ export default function LandingPage() {
                 door.
               </p>
 
-              <Link to="/foods" className="mt-4 inline-flex sm:mt-7">
+              {/* Ordering needs an account, so the call to action creates one. */}
+              <Link to="/sign-up" className="mt-4 inline-flex sm:mt-7">
                 <Button size="lg" className="rounded-full px-6 text-sm sm:px-8 sm:text-base">
                   Order now
                   <ArrowRight className="size-4" aria-hidden />

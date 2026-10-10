@@ -17,7 +17,7 @@ import { slugify, uid } from "@/lib/utils";
 export { ServiceError };
 
 /**
- * Catalog services — foods, vendors, cuisines, proteins and extras.
+ * Catalog services, foods, vendors, cuisines, proteins and extras.
  *
  * Backend contract mirrored by every function:
  *   foods     GET|POST|PATCH|DELETE  /foods
@@ -28,7 +28,7 @@ export { ServiceError };
  *
  * In mock mode these read and write the reactive development repository.
  * When `VITE_API_URL` is set, the same signatures should delegate to
- * `api.get("/foods")` etc. — the transport already exists in client.ts.
+ * `api.get("/foods")` etc., the transport already exists in client.ts.
  *
  * NOTE ON AUTHORIZATION: the ownership assertions below are defence-in-depth
  * for the UI. The real backend MUST independently enforce that a vendor can
@@ -415,7 +415,7 @@ export const foodService = {
 
   /**
    * Food-first search (§22). The term matches name, description, category,
-   * cuisine and ingredient text — never addresses; those are handled by the
+   * cuisine and ingredient text, never addresses; those are handled by the
    * separate location control.
    */
   search(query: FoodSearchQuery): FoodWithVendor[] {
@@ -503,7 +503,7 @@ export const foodService = {
       .slice(0, limit);
   },
 
-  /** Vendor-scoped create — enforced, not merely hidden in the UI. */
+  /** Vendor-scoped create, enforced, not merely hidden in the UI. */
   create(input: Omit<FoodItem, "id" | "createdAt" | "updatedAt">, actorId?: string): FoodItem {
     const vendor = getDb().vendors.find((v) => v.id === input.vendorId);
     if (!vendor) throw new ServiceError("Select the kitchen this dish belongs to.");

@@ -4,8 +4,10 @@ import {
   BadgePercent,
   Bike,
   ClipboardList,
+  Compass,
   Drumstick,
   ExternalLink,
+  Heart,
   Image as ImageIcon,
   LayoutDashboard,
   ListChecks,
@@ -15,6 +17,7 @@ import {
   Package,
   PlusCircle,
   Settings,
+  ShoppingBag,
   Store,
   Truck,
   UserCog,
@@ -24,12 +27,11 @@ import {
 } from "lucide-react";
 import type { Role } from "@/types";
 import { Avatar, Badge, Button, GlassCard } from "@/components/ui";
-import { Logo } from "@/components/layout/public";
+import { AccountMenu, Logo } from "@/components/layout/public";
 import { cn } from "@/lib/utils";
-import { useSession } from "@/hooks";
+import { useCartCount, useSession } from "@/hooks";
 import { authService } from "@/services";
 import { homeRouteFor } from "@/services/guards";
-import { toast } from "sonner";
 
 interface NavItem {
   to: string;
@@ -43,6 +45,37 @@ interface NavSection {
   title: string;
   items: NavItem[];
 }
+
+/**
+ * The customer console.
+ *
+ * Same shell as the kitchen console, reduced to what a customer owns: their
+ * cart, their orders, their saved dishes and their own account. Nothing here
+ * can reach another person's data, which is exactly why the two consoles look
+ * alike while offering different powers.
+ */
+const CUSTOMER_NAV: NavSection[] = [
+  {
+    title: "Order",
+    items: [
+      { to: "/app", label: "Home", icon: LayoutDashboard, end: true },
+      { to: "/app/cart", label: "Cart", icon: ShoppingBag },
+      { to: "/app/orders", label: "My orders", icon: ClipboardList },
+      { to: "/app/favorites", label: "Saved dishes", icon: Heart },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      { to: "/app/reviews", label: "My reviews", icon: MessageSquare },
+      { to: "/app/profile", label: "Profile and addresses", icon: UserCog },
+    ],
+  },
+  {
+    title: "Discover",
+    items: [{ to: "/foods", label: "All dishes", icon: Compass }],
+  },
+];
 
 const VENDOR_NAV: NavSection[] = [
   {
@@ -110,11 +143,20 @@ const ADMIN_NAV: NavSection[] = [
 ];
 
 function navFor(role: Role): NavSection[] {
-  return role === "admin" ? ADMIN_NAV : VENDOR_NAV;
+  if (role === "admin") return ADMIN_NAV;
+  return role === "customer" ? CUSTOMER_NAV : VENDOR_NAV;
 }
+
+/** What the account is allowed to do, spelled out in the console header. */
+const ROLE_LABEL: Record<Role, string> = {
+  customer: "Customer",
+  vendor: "Vendor console",
+  admin: "Merchant console",
+};
 
 export function DashboardLayout({ role }: { role: Role }) {
   const { user, vendor } = useSession();
+  const cartCount = useCartCount();
   const navigate = useNavigate();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -226,12 +268,29 @@ export function DashboardLayout({ role }: { role: Role }) {
         >
           <ExternalLink className="size-4" aria-hidden /> View storefront
         </Link>
+        {user.role === "customer" ? (
+          <Link
+            to="/app/cart"
+            className="flex items-center justify-between gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground/75 transition-colors hover:bg-white/60"
+          >
+            <span className="flex items-center gap-2.5">
+              <ShoppingBag className="size-4" aria-hidden /> Your cart
+            </span>
+            {cartCount > 0 ? (
+              <span className="flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                {cartCount}
+              </span>
+            ) : null}
+          </Link>
+        ) : null}
         <button
           type="button"
           onClick={() => {
             authService.signOut();
-            toast.success("Signed out");
-            navigate("/");
+            // Hard navigation: the route guard redirects to the sign-in screen
+            // as soon as the session clears inside a guarded route, so a soft
+            // navigate cannot outrun it. See AccountMenu for the same rule.
+            window.location.replace("/");
           }}
           className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10"
         >
@@ -293,8 +352,23 @@ export function DashboardLayout({ role }: { role: Role }) {
             </div>
 
             <Badge tone={user.role === "admin" ? "primary" : "info"} className="hidden sm:inline-flex">
-              {user.role === "admin" ? "Merchant console" : "Vendor"}
+              {ROLE_LABEL[user.role]}
             </Badge>
+
+            {user.role === "customer" ? (
+              <Link
+                to="/app/cart"
+                aria-label="Your cart"
+                className="relative inline-flex size-10 items-center justify-center rounded-full border border-white/50 bg-white/40 backdrop-blur-xl transition-colors hover:bg-white/70"
+              >
+                <ShoppingBag className="size-4" aria-hidden />
+                {cartCount > 0 ? (
+                  <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                    {cartCount}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
 
             <Link to="/foods" className="hidden sm:block">
               <Button size="sm" variant="glass">
@@ -302,7 +376,7 @@ export function DashboardLayout({ role }: { role: Role }) {
               </Button>
             </Link>
 
-            <Avatar name={user.fullName} src={user.avatarUrl} className="size-10" />
+            <AccountMenu align="end" />
           </div>
         </header>
 
@@ -313,6 +387,29 @@ export function DashboardLayout({ role }: { role: Role }) {
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Page container for console screens.
+ *
+ * The console shell already pads its main region, so this only caps the width
+ * and spaces the blocks. It is the console counterpart of the storefront's
+ * `PageContainer`, which keeps the two surfaces reading as different places.
+ */
+export function DashboardContainer({
+  children,
+  className,
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <div id={id} className={cn("mx-auto w-full max-w-6xl space-y-6", className)}>
+      {children}
     </div>
   );
 }

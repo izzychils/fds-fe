@@ -1,5 +1,5 @@
 /**
- * Food Delivery System — shared domain types.
+ * Chupnow, shared domain types.
  *
  * These interfaces are the single source of truth for the client-side data
  * layer AND act as the integration contract for the future backend: every
@@ -7,7 +7,7 @@
  * mock adapter for the real HTTP transport requires no UI changes.
  *
  * All monetary values are integers in Nigerian naira (kobo are not modelled at
- * this stage — the platform prices whole-naira items).
+ * this stage, the platform prices whole-naira items).
  */
 
 /* ------------------------------------------------------------------ roles */
@@ -52,10 +52,10 @@ export interface User {
   phone: string;
   role: Role;
   avatarUrl?: string;
-  /** Customer preferences — also feed the recommendation engine. */
+  /** Customer preferences, also feed the recommendation engine. */
   dietaryPreferences: DietaryPreference[];
   favoriteCuisineIds: string[];
-  /** Set for `role === "vendor"` — scopes every vendor-scoped request. */
+  /** Set for `role === "vendor"`, scopes every vendor-scoped request. */
   vendorId?: string | null;
   isActive: boolean;
   /** Recoverable development credential. Never a real password store. */
@@ -144,7 +144,7 @@ export interface FoodItem {
   prepTimeMinutes: number;
   calories?: number;
   isAvailable: boolean;
-  /** Stock control — drives the "sold out" state in the marketplace. */
+  /** Stock control, drives the "sold out" state in the marketplace. */
   stockCount: number | null;
   lowStockThreshold: number;
   isPopular: boolean;
@@ -196,7 +196,7 @@ export interface CartAddOn {
 }
 
 export interface CartItem {
-  /** Line id — one cart line per unique customization combination. */
+  /** Line id, one cart line per unique customization combination. */
   id: string;
   foodId: string;
   vendorId: string;
@@ -295,7 +295,7 @@ export interface Order {
   address: Address;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
-  /** Development payment transport — see `services/payments.ts`. */
+  /** Development payment transport, see `services/payments.ts`. */
   paymentReference: string | null;
   riderId: string | null;
   timeline: OrderEvent[];
@@ -373,7 +373,7 @@ export interface PlatformSettings {
   defaultDeliveryFee: number;
   defaultDeliveryMinutes: number;
   defaultPrepMinutes: number;
-  /** Platform-wide cuisine list — fully editable (§16, §21). */
+  /** Platform-wide cuisine list, fully editable (§16, §21). */
   categories: string[];
   feeType: FeeType;
   feeValue: number;

@@ -23,7 +23,7 @@ import { calcPlatformFee } from "@/lib/orders";
  *
  * This is the ONLY place sample content lives. It is loaded by the mock
  * adapter in `src/services/repository.ts` the first time the app runs, then
- * persisted to localStorage — exactly the shape the real backend will return.
+ * persisted to localStorage, exactly the shape the real backend will return.
  *
  * Food photography comes from the supplied `inspo/` reference folder.
  * Demo credentials are intentionally weak and development-only.
@@ -1025,11 +1025,11 @@ const promoCodes: PromoCode[] = [
 ];
 
 const settings: PlatformSettings = {
-  siteName: "Food Delivery System",
+  siteName: "Chupnow",
   tagline: "Fresh food from kitchens near you, delivered hot.",
-  logoText: "Food Delivery System",
-  logoUrl: null,
-  contactEmail: "support@nmaskitchen.ng",
+  logoText: "Chupnow",
+  logoUrl: "/logo.png",
+  contactEmail: "support@chupnow.ng",
   phone: "0800 662 5000",
   supportHours: "Daily, 7:00am – 11:00pm WAT",
   address: "152 Ademola Adetokunbo Crescent, Wuse II, Abuja",
@@ -1061,7 +1061,7 @@ const banners: Banner[] = [
   },
   {
     id: "bnr_2",
-    badge: "New on Food Delivery System",
+    badge: "New on Chupnow",
     title: "Stone-baked pepperoni",
     subtitle: "48-hour fermented dough from Slice & Spice Pizzeria. Personal to family size.",
     image: IMG.pizza,
@@ -1449,9 +1449,14 @@ export function createSeedDatabase(): Database {
   };
 }
 
-/** Surfaces the demo logins in the sign-in screen. Development only. */
+/**
+ * Demo logins offered by the sign-in screen. Development only.
+ *
+ * Labelled by ROLE only: this panel renders on a public page, before anybody
+ * has authenticated, so it must not name a real person's account.
+ */
 export const DEMO_ACCOUNTS = [
-  { role: "customer" as const, email: "adaeze@example.com", label: "Customer, Adaeze Okafor" },
-  { role: "vendor" as const, email: "grill@grillrepublic.ng", label: "Vendor, Grill Republic" },
-  { role: "admin" as const, email: "merchant@nmaskitchen.ng", label: "Merchant (Admin), Nma Odili" },
+  { role: "customer" as const, email: "adaeze@example.com", label: "Customer account" },
+  { role: "vendor" as const, email: "grill@grillrepublic.ng", label: "Kitchen account" },
+  { role: "admin" as const, email: "merchant@nmaskitchen.ng", label: "Admin account" },
 ];
