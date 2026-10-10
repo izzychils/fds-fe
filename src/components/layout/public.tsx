@@ -322,12 +322,11 @@ const DESKTOP_LINKS = PUBLIC_LINKS.filter(
  *
  * Guests get discovery only: brand, navigation and a single "Order now" call to
  * action which lands on sign-up, because ordering needs an account. There is no
- * search field, no cart button and no separate sign-up button here: the one CTA
- * covers account creation, and anything that belongs behind a session (the
- * dashboard, the cart, the delivery address) only appears once one exists.
+ * search field, no cart button, no separate sign-up button and no account name
+ * here: the one CTA covers account creation, and an identity belongs to the
+ * console shell, not to the storefront a visitor is browsing.
  */
 export function PublicHeader() {
-  const { user } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -363,8 +362,6 @@ export function PublicHeader() {
                 <ArrowRight className="size-3.5" aria-hidden />
               </Button>
             </Link>
-
-            {user ? <AccountMenu /> : null}
 
             <button
               type="button"
@@ -424,7 +421,7 @@ const FOOTER_LINKS: Array<{ to: string; label: string }> = [
   { to: "/contact", label: "Contact" },
   { to: "/help", label: "Help centre" },
   { to: "/help#refunds", label: "Refund policy" },
-  { to: "/terms", label: "Terms of service" },
+  { to: "/terms", label: "Terms and conditions" },
   { to: "/privacy", label: "Privacy policy" },
 ];
 

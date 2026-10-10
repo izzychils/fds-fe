@@ -602,85 +602,6 @@ function LegalDocument({
   );
 }
 
-const TERMS_OF_USE: LegalSection[] = [
-  {
-    heading: "1. Eligibility",
-    body: [
-      "You must be 18 or older, or use the service with a parent or guardian's permission. Vendors must be legally able to run a food business.",
-    ],
-  },
-  {
-    heading: "2. Accounts",
-    body: [
-      "Provide accurate details and keep your log-in secure. You are responsible for activity under your account.",
-    ],
-  },
-  {
-    heading: "3. Customers",
-    body: ["You agree to:"],
-    bullets: [
-      "give a correct delivery address and phone number, and be reachable for delivery;",
-      "tell the vendor about allergies and dietary needs in the order notes. Vendors, not Chupnow, prepare the food;",
-      "pay for the orders you place.",
-    ],
-  },
-  {
-    heading: "4. Vendors and merchants",
-    body: ["You agree to:"],
-    bullets: [
-      "register truthfully and keep your menu, prices, availability, location, delivery timeline and fee accurate;",
-      "hold and keep valid the licences, hygiene and food-safety approvals your business needs under Nigerian law;",
-      "prepare food safely, describe allergens and ingredients honestly and keep orders on time;",
-      "manage your riders responsibly and keep their details up to date;",
-      "respond to reviews fairly and professionally.",
-    ],
-  },
-  {
-    heading: "5. Reviews and uploads",
-    body: [
-      "Reviews must be honest, based on a real order, and free of abuse, hate, spam or private information. You keep ownership of your photos and text and give us a licence to display them on the platform. We may remove content that breaks these terms.",
-    ],
-  },
-  {
-    heading: "6. Prohibited conduct",
-    body: ["You must not:"],
-    bullets: [
-      "place fake or fraudulent orders, or abuse refunds and promotions;",
-      "sell unlawful, unsafe or misdescribed food;",
-      "harass or threaten customers, vendors, riders or staff;",
-      "scrape, copy or interfere with the platform, or attempt to access accounts or dashboards that are not yours;",
-      "take orders or payments outside the platform to avoid fees, where our rules forbid it.",
-    ],
-  },
-  {
-    heading: "7. Recommendations and tracking",
-    body: [
-      "Dish recommendations and delivery estimates are guides, not promises. Live tracking depends on device, network and map services and may be delayed or inaccurate. In this development build the rider position on the map is simulated, and the page says so.",
-    ],
-  },
-  {
-    heading: "8. Administrators",
-    body: [
-      "Platform administrators may review vendors, orders and content, set platform fees and suspend accounts that break these terms or the law.",
-    ],
-  },
-  {
-    heading: "9. Our property",
-    body: [
-      "The Chupnow name, logo, software and design belong to us. Vendors own their own menus, names and photos.",
-    ],
-  },
-  {
-    heading: "10. Suspension and ending",
-    body: [
-      "We may suspend or end an account for breach of these terms. You may stop using the platform at any time.",
-    ],
-  },
-  {
-    heading: "11. Changes",
-    body: ["We may update these terms and will notify you. Continued use means you accept the changes."],
-  },
-];
 
 const TERMS_AND_CONDITIONS: LegalSection[] = [
   {
@@ -843,19 +764,13 @@ export function TermsPage() {
   return (
     <PageContainer className="max-w-3xl space-y-8">
       <LegalDocument
-        title="Terms of Use"
-        updated="April 2024"
-        intro="These Terms of Use apply to everyone who uses the Chupnow website, app and merchant dashboard: customers, vendors and administrators. By using the platform you agree to them."
-        sections={TERMS_OF_USE}
-      />
-      <LegalDocument
         title="Terms and Conditions"
         updated="April 2024"
-        intro="These Terms and Conditions set out how orders, payments, fees and responsibilities work on Chupnow. They apply with the Terms of Use and Privacy Policy."
+        intro="These Terms and Conditions apply to everyone who uses Chupnow, the website, app and merchant dashboard: customers, vendors and administrators. They set out how orders, payments, fees and responsibilities work. By using the platform you agree to them, and to the Privacy Policy."
         sections={TERMS_AND_CONDITIONS}
       />
       <p className="text-xs text-muted-foreground">
-        Questions about either document can be sent to {settings.contactEmail}. This is a development
+        Questions about this document can be sent to {settings.contactEmail}. This is a development
         build: payments, delivery GPS and authentication are served by local mock adapters rather than
         live providers.
       </p>

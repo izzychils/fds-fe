@@ -42,8 +42,12 @@ function applyBrandMigration(db: Database): { next: Database; changed: boolean }
   // module initialiser, before any later `const` in this file is initialised.
   const current = db.settings;
   if (!current) return { next: db, changed: false };
-  const staleName = current.siteName === "Food Delivery System";
-  const staleLogoText = current.logoText === "Food Delivery System";
+  // Every name this storefront has shipped under, so a database stored under an
+  // older one is caught. Matching only the most recent rename left browsers that
+  // saved the original name still showing it.
+  const staleNames = ["Nma's Kitchen", "Food Delivery System"];
+  const staleName = staleNames.includes(current.siteName ?? "");
+  const staleLogoText = staleNames.includes(current.logoText ?? "");
   const staleEmail = current.contactEmail === "support@nmaskitchen.ng";
   const missingLogo = !current.logoUrl;
   if (!staleName && !staleLogoText && !staleEmail && !missingLogo) {
