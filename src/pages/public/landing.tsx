@@ -210,9 +210,12 @@ export default function LandingPage() {
                     intensity="card"
                     className="flex flex-col gap-1 rounded-2xl p-3.5"
                   >
-                    <dt className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                      <stat.icon className="size-3.5 text-primary" aria-hidden />
-                      <span className="truncate">{stat.label}</span>
+                    {/* Labels wrap rather than truncate: at phone widths the
+                        three cards are about 100px each, and "AVERAG…" tells
+                        the reader nothing. */}
+                    <dt className="flex items-start gap-1.5 text-[11px] font-bold uppercase leading-tight tracking-wide text-muted-foreground">
+                      <stat.icon className="mt-px size-3.5 shrink-0 text-primary" aria-hidden />
+                      <span>{stat.label}</span>
                     </dt>
                     <dd className="text-2xl font-extrabold tracking-tight">{stat.value}</dd>
                   </GlassCard>

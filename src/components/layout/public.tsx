@@ -576,13 +576,14 @@ export function PublicFooter() {
  * Mobile quick navigation.
  *
  * Only rendered for a signed-in customer: every tab points at an authenticated
- * route, so showing it to a visitor would advertise a dashboard they cannot
- * open. Guests keep the brand, the nav and search instead.
+ * customer route, so showing it to a visitor would advertise a dashboard they
+ * cannot open, and showing it to a signed-in vendor would offer tabs whose
+ * routes reject them. Guests keep the brand, the nav and search instead.
  */
 export function MobileTabBar() {
   const cartCount = useCartCount();
   const { user } = useSession();
-  if (!user) return null;
+  if (user?.role !== "customer") return null;
 
   const tabs = [
     { to: "/app", label: "Home", icon: Home },
