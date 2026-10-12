@@ -430,7 +430,11 @@ export function Rating({
 }) {
   const starSize = size === "md" ? "size-4" : "size-3.5";
   return (
-    <span className={cn("inline-flex items-center gap-1", className)}>
+    /* `relative` keeps the sr-only text inside this row: an absolutely
+       positioned child only gets clipped by ancestors between it and its
+       containing block, so without a positioned ancestor of its own it escapes
+       scroll containers and widens the document. */
+    <span className={cn("relative inline-flex items-center gap-1", className)}>
       <Star className={cn(starSize, "fill-amber-400 text-amber-400")} aria-hidden />
       <span className="text-xs font-bold">{value > 0 ? value.toFixed(1) : "New"}</span>
       {count !== undefined ? (

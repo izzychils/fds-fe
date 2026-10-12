@@ -174,7 +174,16 @@ function Stars({
   className?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5", className)}>
+    /*
+     * `relative` makes THIS row the containing block for the `sr-only` text
+     * below. Without it the absolutely-positioned sr-only span resolves
+     * against a far-up positioned ancestor, escaping the card and the
+     * horizontal snap rail (overflow does not clip an absolutely positioned
+     * box whose containing block lies outside it) and stretching the document
+     * to the rail's full scroll width — the phantom blank space mobile users
+     * pan into when pinch-zooming.
+     */
+    <span className={cn("relative inline-flex items-center gap-1.5", className)}>
       <span className="flex gap-0.5" aria-hidden>
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
