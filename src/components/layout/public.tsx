@@ -423,8 +423,9 @@ export function PublicHeader() {
           aria-label="Mobile"
           className="absolute inset-x-0 top-full z-20 mx-auto w-full pb-3 xl:hidden"
         >
-          {/* Half the page wide, links centred inside it. */}
-          <div className="mx-auto grid w-1/2 gap-1 rounded-2xl border border-white/40 bg-white/55 p-2 text-center text-foreground shadow-2xl shadow-black/20 backdrop-blur-2xl dark:border-white/20 dark:bg-black/50">
+          {/* Half the page wide, hung off the right edge under the toggle,
+              with the links centred inside it. */}
+          <div className="ml-auto grid w-1/2 gap-1 rounded-2xl border border-white/40 bg-white/55 p-2 text-center text-foreground shadow-2xl shadow-black/20 backdrop-blur-2xl dark:border-white/20 dark:bg-black/50">
             {PUBLIC_LINKS.map((link) => (
               <Link
                 key={link.to}

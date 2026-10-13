@@ -48,7 +48,7 @@ function applyBrandMigration(db: Database): { next: Database; changed: boolean }
   const staleNames = ["Nma's Kitchen", "Food Delivery System"];
   const staleName = staleNames.includes(current.siteName ?? "");
   const staleLogoText = staleNames.includes(current.logoText ?? "");
-  const staleEmail = current.contactEmail === "support@nmaskitchen.ng";
+  const staleEmail = current.contactEmail === "support@chupnow.com";
   const missingLogo = !current.logoUrl;
   if (!staleName && !staleLogoText && !staleEmail && !missingLogo) {
     return { next: db, changed: false };
@@ -62,7 +62,7 @@ function applyBrandMigration(db: Database): { next: Database; changed: boolean }
         siteName: staleName ? "Chupnow" : current.siteName,
         logoText: staleLogoText ? "Chupnow" : current.logoText,
         logoUrl: current.logoUrl ?? "/logo.png",
-        contactEmail: staleEmail ? "support@chupnow.ng" : current.contactEmail,
+        contactEmail: staleEmail ? "support@chupnow.com" : current.contactEmail,
       },
     },
   };
