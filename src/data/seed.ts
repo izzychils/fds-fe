@@ -1081,7 +1081,7 @@ const settings: PlatformSettings = {
   tagline: "Fresh food from kitchens near you, delivered hot.",
   logoText: "Chupnow",
   logoUrl: "/logo.png",
-  contactEmail: "support@chupnow.ng",
+  contactEmail: "support@chupnow.com",
   phone: "0800 662 5000",
   supportHours: "Daily, 7:00am – 11:00pm WAT",
   address: "152 Ademola Adetokunbo Crescent, Wuse II, Abuja",
