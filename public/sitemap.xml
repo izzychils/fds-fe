@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Public pages of www.chupnow.com. Signed-in consoles are excluded. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.chupnow.com/</loc></url>
+  <url><loc>https://www.chupnow.com/foods</loc></url>
+  <url><loc>https://www.chupnow.com/partners</loc></url>
+  <url><loc>https://www.chupnow.com/about</loc></url>
+  <url><loc>https://www.chupnow.com/contact</loc></url>
+  <url><loc>https://www.chupnow.com/help</loc></url>
+  <url><loc>https://www.chupnow.com/terms</loc></url>
+  <url><loc>https://www.chupnow.com/privacy</loc></url>
+</urlset>

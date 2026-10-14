@@ -1,3 +1,32 @@
 # robots.txt - www.chupnow.com
+#
+# Crawl rules for search engines. Allow/Disallow control crawling, not
+# indexing: a Disallow only stops a URL being fetched, and pages that must
+# never appear in results also need a noindex tag.
+
 User-agent: *
+
+# ------------------------------------------------- public pages to index
 Allow: /
+Allow: /foods
+Allow: /partners
+Allow: /about
+Allow: /contact
+Allow: /help
+Allow: /terms
+Allow: /privacy
+
+# ------------------------------------- signed-in consoles and account screens
+# /app, /vendor and /admin all sit behind the sign-in guard, so a crawler only
+# ever reaches the auth redirect from them.
+Disallow: /app
+Disallow: /vendor
+Disallow: /admin
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /vendor-signup
+Disallow: /forgot-password
+Disallow: /404
+
+# ---------------------------------------------------------------- sitemap
+Sitemap: https://www.chupnow.com/sitemap.xml
