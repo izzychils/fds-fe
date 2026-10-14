@@ -1,0 +1,3 @@
+# robots.txt - www.chupnow.com
+User-agent: *
+Allow: /
